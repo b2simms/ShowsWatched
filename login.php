@@ -34,15 +34,11 @@ include_once 'partials/parseLogin.php';
         </label>
       </div>
 
-      <a href="forgot_password.php">Forgot Password?</a>
-
       <button name="loginBtn" type="submit" class="btn btn-primary pull-right">Sign In</button>
 
     </form>
 
   </section>
-
-  <?php include_once 'partials/back_button.php'; ?>
   
 </div>
 

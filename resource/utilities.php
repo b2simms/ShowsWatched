@@ -115,3 +115,55 @@ function checkDuplicateEntries($table, $column_name, $value, $db){
     }
    
 }
+
+/**
+ * @param $form_episode_array, the array holding all
+ * episodes which we want to loop through
+ * @return string, list containing all episodes
+ */
+function show_messages($form_episode_array){
+
+    $episodes = '';
+
+    $series = 0;
+
+    //loop through error array and display all items in a list
+    foreach($form_episode_array as $the_episode){
+
+        var_dump($the_episode['status']);
+
+            //set series header
+            if($series != $the_episode['season']){
+                $series++;
+                $episodes .= '<blockquote class="blockquote series-header"><p class="m-b-0">';
+                $episodes .= 'Series '.$series.'</p></blockquote>';
+            }
+
+            $episodes .= '<blockquote class="blockquote">';
+            if($the_episode['status'] === 0){
+                $episodes .= '<p class="m-b-0 pill-label">';
+            }else{
+                $episodes .= '<p class="m-b-0">';
+            }
+
+            if($the_episode['status'] === 2){
+                $episodes .= '<span class="label label-success">Watched</span>';
+            }else if($the_episode['status'] === 1){
+                $episodes .= '<span class="label label-warning">Claimed by ';
+                $episodes .= "{$the_episode['assigned_name']}";
+                $episodes .= '</span>';
+            }else if($the_episode['status'] === 0){
+                $episodes .= '<span class="label label-info">To Watch</span>';
+            }
+
+            $episodes .= '</p><footer class="blockquote-footer">Season:';
+            $episodes .=  "{$the_episode['season']},";
+            $episodes .= '<cite title="Source Title"> Episode ';
+            $episodes .= "{$the_episode['episode']}</cite></footer>";
+            $episodes .= "{$the_episode['name']}";
+            $episodes .= '</blockquote>';
+        }
+    
+
+    return $episodes;
+}

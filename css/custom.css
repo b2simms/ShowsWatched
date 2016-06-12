@@ -6,3 +6,27 @@ body{
 	padding: 80px 15px;
 	text-align: center;
 }
+
+.series-header{
+    background-color: #373a3c;
+    color: #fff;
+}
+p.m-b-0{
+    text-align: left;
+}
+p.m-b-0.pill-label{
+    text-align: left;
+}
+
+@media screen and (max-width: 550px) {
+    body {
+    	padding: 0px;
+    }
+    .container{
+    	margin: 0px;
+    	padding: 0px;
+    }
+    .blockquote{
+    	padding: 0px;
+    }
+}
