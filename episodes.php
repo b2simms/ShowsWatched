@@ -10,8 +10,20 @@ include_once 'resource/utilities.php';
 <head lang="en">
     <meta charset="UTF-8">
     <title>Episodes list</title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script type="text/javascript">
+        $(window).scroll(function () {
+            if ($(window).scrollTop() > 226) {
+                $(".header").addClass("fixed");
+            } else {
+                $(".header").removeClass("fixed");
+            }
+        });
+    </script>
+
 </head>
-<body>
+<body data-spy="scroll" data-target="#myScrollspy" data-offset="20">
 
  <div>
 <?php if(isset($result)) echo $result; ?>
@@ -42,9 +54,29 @@ include_once 'resource/utilities.php';
 
     $message_list = $statement->fetchAll();
     
-    echo show_messages($message_list);
+
+    //echo show_messages($message_list);
 
 ?>
+
+  <div class="container-fluid">
+    <div class="row">
+      <nav class="fixed" id="myScrollspy">
+        <ul class="nav nav-pills">
+          <li><a href="#section1">Series 1</a></li>
+          <li><a href="#section2">Series 2</a></li>
+          <li><a href="#section3">Series 3</a></li>
+          <li><a href="#section4">Series 4</a></li>
+          <li><a href="#section5">Series 5</a></li>
+          <li><a href="#section6">Series 6</a></li>
+          <li><a href="#section7">Series 7</a></li>
+          <li><a href="#section8">Series 8</a></li>
+          <li><a href="#section9">Series 9</a></li>
+        </ul>
+      </nav>
+        <?php echo show_messages($message_list); ?>
+    </div>
+  </div>
 
 </body>
 </html>

@@ -1,5 +1,6 @@
 body{
 	padding: 50px;
+    position: relative;
 }
 
 .flag{
@@ -15,7 +16,24 @@ p.m-b-0{
     text-align: left;
 }
 p.m-b-0.pill-label{
-    text-align: left;
+    text-align: right;
+}
+
+.blockquote{
+    border-bottom: 2px solid #888888;
+}
+
+.watched{
+    background-color: #eeeeee;
+}
+
+.fixed {
+    position:fixed;
+    top:50px; 
+}
+
+.nav-pills{
+    background-color: #373a3c;
 }
 
 @media screen and (max-width: 550px) {
