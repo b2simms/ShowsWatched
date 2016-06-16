@@ -135,8 +135,7 @@ function checkDuplicateEntries($table, $column_name, $value, $db){
  * episodes which we want to loop through
  * @return string, list containing all episodes
  */
-function show_messages($form_episode_array){
-
+function show_episodes($form_episode_array){
     $episodes = '';
 
     $series = 0;
@@ -174,13 +173,46 @@ function show_messages($form_episode_array){
                 $episodes .= '<span class="label label-info">To Watch</span>';
             }
 
+            //set buttons
+            if(isAuthorizedUser() && $the_episode['status'] === '0'){
+                $episodes .= '<form action="" method="post">';
+                $episodes .= '<input type="hidden" name="id" value="';
+                $episodes .= "{$the_episode['id']}";
+                $episodes .= '">';
+                $episodes .= '<button name="claimBtn" type="submit" class="btn btn-warning btn-sm">Claim Episode</button>';
+                $episodes .= '</form>';
+            }else if(isAuthorizedUser() && $the_episode['status'] === '1' && strcasecmp($the_episode['assigned_name'], $_SESSION['username']) == 0 ){
+                $episodes .= '<form action="" method="post">';
+                $episodes .= '<input type="hidden" name="id" value="';
+                $episodes .= "{$the_episode['id']}";
+                $episodes .= '">';
+                $episodes .= '<button name="unclaimBtn" type="submit" class="btn btn-danger btn-sm">Unclaim Episode</button>';
+                $episodes .= '</form>';
+            }
+             if(isAdminUser() && $the_episode['status'] === '2'){
+                $episodes .= '<form action="" method="post">';
+                $episodes .= '<input type="hidden" name="id" value="';
+                $episodes .= "{$the_episode['id']}";
+                $episodes .= '">';
+                $episodes .= '<button name="unwatchBtn" type="submit" class="btn btn-danger btn-sm">Unwatch</button>';
+                $episodes .= '</form>';
+            }else if(isAdminUser()){
+                $episodes .= '<form action="" method="post">';
+                $episodes .= '<input type="hidden" name="id" value="';
+                $episodes .= "{$the_episode['id']}";
+                $episodes .= '">';
+                $episodes .= '<button name="watchBtn" type="submit" class="btn btn-info btn-sm">Watch Episode</button>';
+                $episodes .= '</form>';
+            }
+
             $episodes .= '</p><footer class="blockquote-footer">';
             $episodes .= '<cite title="Source Title"> Episode ';
-            $episodes .= "{$the_episode['episode']}</cite></footer>";
+            $episodes .= "{$the_episode['episode']} </cite>";
+            $episodes .= '</footer>';
             $episodes .= "{$the_episode['name']}";
             $episodes .= '</blockquote>';
+
         }
     
-
     return $episodes;
 }

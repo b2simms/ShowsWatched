@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 13, 2016 at 03:47 AM
+-- Generation Time: Jun 16, 2016 at 01:02 PM
 -- Server version: 5.6.17
 -- PHP Version: 5.5.12
 
@@ -90,9 +90,9 @@ INSERT INTO `episodes` (`id`, `season`, `episode`, `date`, `name`, `status`, `as
 (45, 4, 5, NULL, 'The Sontaran Strategem 1/2', 2, ''),
 (46, 4, 6, NULL, 'The Poison Sky 2/2', 2, ''),
 (47, 4, 7, NULL, 'The Doctor''s Daughter', 2, ''),
-(48, 4, 8, NULL, 'The Unicorn and the Wasp', 0, ''),
-(49, 4, 9, NULL, 'Silence in the Library 1/2', 0, ''),
-(50, 4, 10, NULL, 'Forest of the Dead 2/2', 0, ''),
+(48, 4, 8, NULL, 'The Unicorn and the Wasp', 2, ''),
+(49, 4, 9, NULL, 'Silence in the Library 1/2', 2, ''),
+(50, 4, 10, NULL, 'Forest of the Dead 2/2', 2, 'david'),
 (51, 4, 11, NULL, 'Midnight', 0, ''),
 (52, 4, 12, NULL, 'Turn Left', 0, ''),
 (53, 4, 13, NULL, 'The Stolen Earth 1/2', 0, ''),
@@ -361,15 +361,16 @@ CREATE TABLE IF NOT EXISTS `users` (
   `join_date` timestamp NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`,`email`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=8 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=10 ;
 
 --
 -- Dumping data for table `users`
 --
 
 INSERT INTO `users` (`id`, `username`, `password`, `email`, `join_date`) VALUES
-(6, 'demo2', '$2y$10$yFZnjPdF9nrTGd6MKKLma.V6NIAPDsYeCeIftlNeUEPZLFDu4H9NC', 'demo@example.com', '2016-05-29 16:11:17'),
-(7, 'bbbbbb', '$2y$10$um4utOZV0.VaBiBjtEhS1ODkBdg5Q0HgSNd3RYTVYqDb/l/z6.d.a', 'bsim@gmail.com', '2016-05-31 11:33:47');
+(7, 'Emilynn', '$2y$10$9WPCq9KgIKxfOFSlwab81O07AM.11nplIAOTOKgrxalaC7aT7XUbe', '', '2016-06-16 03:39:28'),
+(8, 'admin', '$2y$10$Scn2TjnFsgF0Piz8AEezreOjk6wwpk8BLM88sZg4/ka7QhKsXEccW', '', '2016-06-15 01:59:10'),
+(9, 'David', '$2y$10$SkuzGXltbPPhykUFeBaWheXlDdcrCUOi2Y7yWQh.WbYBUnWFZaaxS', '', '2016-06-16 03:39:39');
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

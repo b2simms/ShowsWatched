@@ -5,6 +5,7 @@ include_once 'resource/utilities.php';
 
 $page_title = "Doctor Who - Episodes"; 
 include_once 'partials/headers.php'; 
+include_once 'partials/parseClaim.php'; 
 ?>
 
 <!DOCTYPE html>
@@ -80,7 +81,7 @@ include_once 'partials/headers.php';
         </ul>
       </nav>
 
-        <?php echo show_messages($message_list); ?>
+        <?php echo show_episodes($message_list); ?>
     </div>
   </div>
 

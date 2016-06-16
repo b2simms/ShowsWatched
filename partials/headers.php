@@ -33,7 +33,7 @@
 	      <ul class="nav navbar-nav">
 	        <li><a href="index.php">Episodes</a></li>
 	        <?php if(isAuthorizedUser()): ?>
-				<li><a href="#">Edit Data</a></li>
+				<!--<li><a href="#">Edit Data</a></li>-->
 				<?php if(isAdminUser()): ?>
 					<li><a href="signup.php">Add Users</a></li>
 				<?php endif ?>
