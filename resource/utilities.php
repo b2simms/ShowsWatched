@@ -150,11 +150,14 @@ function show_episodes($form_episode_array){
                 $episodes .= 'Series '.$series.'</p></blockquote>';
             }
 
-
             if($the_episode['status'] === '2'){
-                $episodes .= '<blockquote class="blockquote watched">';
+                $episodes .= '<blockquote class="blockquote watched" id="episode';
+                $episodes .= "{$the_episode['id']}";
+                $episodes .= '">';
             }else{
-                $episodes .= '<blockquote class="blockquote">';
+                $episodes .= '<blockquote class="blockquote" id="episode';
+                $episodes .= "{$the_episode['id']}";
+                $episodes .= '">';
             }
 
             if($the_episode['status'] === '0'){
@@ -175,14 +178,18 @@ function show_episodes($form_episode_array){
 
             //set buttons
             if(isAuthorizedUser() && $the_episode['status'] === '0'){
-                $episodes .= '<form action="" method="post">';
+                $episodes .= '<form action="index.php#episode';
+                $episodes .= "{$the_episode['id']}";
+                $episodes .= '" method="post">';
                 $episodes .= '<input type="hidden" name="id" value="';
                 $episodes .= "{$the_episode['id']}";
                 $episodes .= '">';
                 $episodes .= '<button name="claimBtn" type="submit" class="btn btn-warning btn-sm">Claim Episode</button>';
                 $episodes .= '</form>';
             }else if(isAuthorizedUser() && $the_episode['status'] === '1' && strcasecmp($the_episode['assigned_name'], $_SESSION['username']) == 0 ){
-                $episodes .= '<form action="" method="post">';
+                $episodes .= '<form action="index.php#episode';
+                $episodes .= "{$the_episode['id']}";
+                $episodes .= '" method="post">';
                 $episodes .= '<input type="hidden" name="id" value="';
                 $episodes .= "{$the_episode['id']}";
                 $episodes .= '">';
@@ -190,14 +197,18 @@ function show_episodes($form_episode_array){
                 $episodes .= '</form>';
             }
              if(isAdminUser() && $the_episode['status'] === '2'){
-                $episodes .= '<form action="" method="post">';
+                $episodes .= '<form action="index.php#episode';
+                $episodes .= "{$the_episode['id']}";
+                $episodes .= '" method="post">';$episodes .= '<form action="" method="post">';
                 $episodes .= '<input type="hidden" name="id" value="';
                 $episodes .= "{$the_episode['id']}";
                 $episodes .= '">';
                 $episodes .= '<button name="unwatchBtn" type="submit" class="btn btn-danger btn-sm">Unwatch</button>';
                 $episodes .= '</form>';
             }else if(isAdminUser()){
-                $episodes .= '<form action="" method="post">';
+                $episodes .= '<form action="index.php#episode';
+                $episodes .= "{$the_episode['id']}";
+                $episodes .= '" method="post">';
                 $episodes .= '<input type="hidden" name="id" value="';
                 $episodes .= "{$the_episode['id']}";
                 $episodes .= '">';
