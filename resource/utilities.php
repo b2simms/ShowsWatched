@@ -8,6 +8,20 @@ function rememberMe($user_id){
     setcookie("rememberUserCookie",$encryptCookieData, time()+60*60*24*100, "/");
 }
 
+function isAdminUser(){
+    if(isAuthorizedUser() && $_SESSION['username'] === "admin"){
+        return true;
+    }
+    return false;
+}
+
+function isAuthorizedUser(){
+    if(isset($_SESSION['username'])){
+        return true;
+    }
+    return false;
+}
+
 /**
  * @param $required_fields_array, n array containing the list of all required fields
  * @return array, containing all errors

@@ -1,4 +1,7 @@
-<?php include_once 'resource/session.php' ?>
+<?php 
+	include_once 'resource/session.php';
+	include_once 'resource/utilities.php';
+ ?>
 <!DOCTYPE html>
 <html>
 <head lang="en">
@@ -24,13 +27,16 @@
 	        <span class="icon-bar"></span>
 	        <span class="icon-bar"></span>
 	      </button>
-	      <a class="navbar-brand" href="index.php">Doctor Who Watch List</a>
+	      <a class="navbar-brand" href="index.php">The Watch List</a>
 	    </div>
 	    <div id="navbar" class="collapse navbar-collapse">
 	      <ul class="nav navbar-nav">
-	        <li><a href="index.php">Home</a></li>
-	        <?php if(isset($_SESSION['username'])): ?>
+	        <li><a href="index.php">Episodes</a></li>
+	        <?php if(isAuthorizedUser()): ?>
 				<li><a href="#">Edit Data</a></li>
+				<?php if(isAdminUser()): ?>
+					<li><a href="signup.php">Add Users</a></li>
+				<?php endif ?>
 				<li><a href="logout.php">Logout</a></li>
 			<?php else: ?>
 	        	<li><a href="login.php">Login</a></li>

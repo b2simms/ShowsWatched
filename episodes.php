@@ -3,6 +3,8 @@
 include_once 'resource/Database.php';
 include_once 'resource/utilities.php';
 
+$page_title = "Doctor Who - Episodes"; 
+include_once 'partials/headers.php'; 
 ?>
 
 <!DOCTYPE html>
@@ -24,40 +26,43 @@ include_once 'resource/utilities.php';
 
 </head>
 <body data-spy="scroll" data-target="#myScrollspy" data-offset="20">
+<div class="container">
+  <div class="flag">
+      <h1>Brent's Doctor Who Watch List</h1>
 
- <div>
-<?php if(isset($result)) echo $result; ?>
-</div>
+    <div>
+      <?php if(isset($result)) echo $result; ?>
+    </div>
 
-<div class="clearfix"></div>
+    <div class="clearfix"></div>
 
-<?php 
-	try{
+    <?php 
+    	try{
 
-        //create SQL insert statement
-        $sqlInsert = "Select * from episodes";
+            //create SQL insert statement
+            $sqlInsert = "Select * from episodes";
 
-        //use PDO prepared to sanitize data
-        $statement = $db->prepare($sqlInsert);
+            //use PDO prepared to sanitize data
+            $statement = $db->prepare($sqlInsert);
 
-		$statement->execute();
+    		$statement->execute();
 
-        //check if one new row was created
-        if($statement->rowCount() == 1){
-            $result = "<p style='padding:20px; border: 1px solid gray; color: green;'> Feedback displayed!</p>";
+            //check if one new row was created
+            if($statement->rowCount() == 1){
+                $result = "<p style='padding:20px; border: 1px solid gray; color: green;'> Feedback displayed!</p>";
+            }
+        }catch (PDOException $ex){
+            $result = "<p style='padding:20px; border: 1px solid gray; color: red;'> An error occurred: ".$ex->getMessage()."</p>";
         }
-    }catch (PDOException $ex){
-        $result = "<p style='padding:20px; border: 1px solid gray; color: red;'> An error occurred: ".$ex->getMessage()."</p>";
-    }
 
-    $valid_query = $statement->setFetchMode(PDO::FETCH_ASSOC); 
+        $valid_query = $statement->setFetchMode(PDO::FETCH_ASSOC); 
 
-    $message_list = $statement->fetchAll();
-    
+        $message_list = $statement->fetchAll();
+        
 
-    //echo show_messages($message_list);
+        //echo show_messages($message_list);
 
-?>
+    ?>
 
   <div class="container-fluid">
     <div class="row">
@@ -74,9 +79,15 @@ include_once 'resource/utilities.php';
           <li><a href="#section9">Series 9</a></li>
         </ul>
       </nav>
+
         <?php echo show_messages($message_list); ?>
     </div>
   </div>
+
+</div>
+</div><!-- /.container -->
+
+<?php include_once 'partials/footers.php'; ?>
 
 </body>
 </html>
