@@ -1,6 +1,5 @@
 body{
 	padding: 50px;
-    position: relative;
 }
 
 .flag{
@@ -37,6 +36,10 @@ p.m-b-0.pill-label{
     background-color: #373a3c;
 }
 
+ .hiddenLarge {
+    display: none;
+}
+
 @media screen and (max-width: 550px) {
     body {
     	padding: 0px;
@@ -47,5 +50,14 @@ p.m-b-0.pill-label{
     }
     .blockquote{
     	padding: 0px;
+    }
+    .hiddenSmall {
+        display: none;
+    }
+    .hiddenLarge {
+        display: block;
+    }
+    .dropdown-menu {
+        min-width: 0px;
     }
 }

@@ -136,8 +136,8 @@ function checkDuplicateEntries($table, $column_name, $value, $db){
  * @return string, list containing all episodes
  */
 function show_episodes($form_episode_array){
+    
     $episodes = '';
-
     $series = 0;
 
     //loop through error array and display all items in a list
@@ -151,69 +151,35 @@ function show_episodes($form_episode_array){
             }
 
             if($the_episode['status'] === '2'){
-                $episodes .= '<blockquote class="blockquote watched" id="episode';
-                $episodes .= "{$the_episode['id']}";
-                $episodes .= '">';
+                $episodes .= addBackgroundTintClass($the_episode, true);
             }else{
-                $episodes .= '<blockquote class="blockquote" id="episode';
-                $episodes .= "{$the_episode['id']}";
-                $episodes .= '">';
+                $episodes .= addBackgroundTintClass($the_episode, false);
             }
 
             if($the_episode['status'] === '0'){
-                $episodes .= '<p class="m-b-0 pill-label">';
+                $episodes .= movePillRight(true);
             }else{
-                $episodes .= '<p class="m-b-0">';
+                $episodes .= movePillRight(false);
             }
 
             if($the_episode['status'] === '2'){
-                $episodes .= '<span class="label label-success">Watched</span>';
+                $episodes .= setPill('success">Watched');
             }else if($the_episode['status'] === '1'){
-                $episodes .= '<span class="label label-warning">Claimed by ';
-                $episodes .= "{$the_episode['assigned_name']}";
-                $episodes .= '</span>';
+                $episodes .= setPill('warning">Claimed by '."{$the_episode['assigned_name']}");
             }else if($the_episode['status'] === '0'){
-                $episodes .= '<span class="label label-info">To Watch</span>';
+                $episodes .= setPill('info">To Watch');
             }
 
             //set buttons
             if(isAuthorizedUser() && $the_episode['status'] === '0'){
-                $episodes .= '<form action="index.php#episode';
-                $episodes .= "{$the_episode['id']}";
-                $episodes .= '" method="post">';
-                $episodes .= '<input type="hidden" name="id" value="';
-                $episodes .= "{$the_episode['id']}";
-                $episodes .= '">';
-                $episodes .= '<button name="claimBtn" type="submit" class="btn btn-warning btn-sm">Claim Episode</button>';
-                $episodes .= '</form>';
+                $episodes .= addForm($the_episode,'warning" name="claimBtn" >Claim Episode');
             }else if(isAuthorizedUser() && $the_episode['status'] === '1' && strcasecmp($the_episode['assigned_name'], $_SESSION['username']) == 0 ){
-                $episodes .= '<form action="index.php#episode';
-                $episodes .= "{$the_episode['id']}";
-                $episodes .= '" method="post">';
-                $episodes .= '<input type="hidden" name="id" value="';
-                $episodes .= "{$the_episode['id']}";
-                $episodes .= '">';
-                $episodes .= '<button name="unclaimBtn" type="submit" class="btn btn-danger btn-sm">Unclaim Episode</button>';
-                $episodes .= '</form>';
+                $episodes .= addForm($the_episode,'danger" name="unclaimBtn" >Unclaim Episode');
             }
              if(isAdminUser() && $the_episode['status'] === '2'){
-                $episodes .= '<form action="index.php#episode';
-                $episodes .= "{$the_episode['id']}";
-                $episodes .= '" method="post">';$episodes .= '<form action="" method="post">';
-                $episodes .= '<input type="hidden" name="id" value="';
-                $episodes .= "{$the_episode['id']}";
-                $episodes .= '">';
-                $episodes .= '<button name="unwatchBtn" type="submit" class="btn btn-danger btn-sm">Unwatch</button>';
-                $episodes .= '</form>';
+                $episodes .= addForm($the_episode,'danger" name="unwatchBtn" >Unwatch');
             }else if(isAdminUser()){
-                $episodes .= '<form action="index.php#episode';
-                $episodes .= "{$the_episode['id']}";
-                $episodes .= '" method="post">';
-                $episodes .= '<input type="hidden" name="id" value="';
-                $episodes .= "{$the_episode['id']}";
-                $episodes .= '">';
-                $episodes .= '<button name="watchBtn" type="submit" class="btn btn-info btn-sm">Watch Episode</button>';
-                $episodes .= '</form>';
+                $episodes .= addForm($the_episode,'info" name="watchBtn" >Watch');
             }
 
             $episodes .= '</p><footer class="blockquote-footer">';
@@ -227,3 +193,38 @@ function show_episodes($form_episode_array){
     
     return $episodes;
 }
+
+function addForm($the_episode, $customHTML){
+
+    $form = '<form action="index.php#episode';
+    $form .= "{$the_episode['id']}".'" method="post">';
+    $form .= '<input type="hidden" name="id" value="';
+    $form .= "{$the_episode['id']}".'">';
+    $form .= '<button type="submit" class="btn btn-sm btn-'.$customHTML.'</button>';
+    $form .= '</form>';
+
+    return $form;
+}
+function addBackgroundTintClass($the_episode, $addClassBoolean){
+
+    $block = '<blockquote class="blockquote '; 
+    if($addClassBoolean){
+        $block .= "watched";    }
+    $block .= '" id="episode'."{$the_episode['id']}".'">';
+
+    return $block;
+}
+
+function movePillRight($movePillBoolean){
+    $pill = '<p class="m-b-0'; 
+    if($movePillBoolean){
+        $pill .= " pill-label";    }
+    $pill .= '">';
+
+    return $pill;
+}
+
+function setPill($customHTML){
+    return '<span class="label label-'.$customHTML.'</span>';
+}
+
