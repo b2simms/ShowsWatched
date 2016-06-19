@@ -204,14 +204,9 @@ if(isset($_SESSION['PHP_Need_Refresh']) && $_SESSION['PHP_Need_Refresh'] = "True
       title: \"Out of Date\",   
       text: \"Refreshing now...\", 
       type: 'error',    
-      timer: 2000,   
-      showConfirmButton: false });
-
-      setTimeout(function(){     
-        window.location.href = 'index.php';  
-      }, 1800);
-
-      </script>";
+      timer: 4000,   
+      showConfirmButton: false 
+    });</script>";
 
   unset($_SESSION['PHP_Need_Refresh']);
 }
