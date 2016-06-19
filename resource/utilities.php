@@ -196,10 +196,18 @@ function show_episodes($form_episode_array){
 
 function addForm($the_episode, $customHTML){
 
+    $number = $the_episode['id'];
+
+    if($number != '1'){
+        $number = $the_episode['id'] - 1;
+    }
+
     $form = '<form action="index.php#episode';
-    $form .= "{$the_episode['id']}".'" method="post">';
+    $form .= "{$number}".'" method="post">';
     $form .= '<input type="hidden" name="id" value="';
     $form .= "{$the_episode['id']}".'">';
+    $form .= '<input type="hidden" name="status" value="';
+    $form .= "{$the_episode['status']}".'">';
     $form .= '<button type="submit" class="btn btn-sm btn-'.$customHTML.'</button>';
     $form .= '</form>';
 
