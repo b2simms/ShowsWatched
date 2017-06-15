@@ -1,0 +1,44 @@
+<div class="dialog-demo-content" layout-wrap layout-margin layout-align="center">
+</div>
+<md-tabs>
+  <md-tab label="Public" ng-click='change(0)'></md-tab>
+  <md-tab label="Private" ng-click='change(1)'></md-tab>
+</md-tabs>
+<md-progress-linear md-mode="indeterminate" ng-show="isLoading"></md-progress-linear>
+
+<md-button class="md-raised md-accent" ng-show="isEditable" ui-sref="series_create">Create New Series</md-button>
+
+<div class="scrollable" ng-style="{height: hgt+ 'px'}">
+  <md-list-item class="md-3-line" ng-repeat="item in series" ng-click="load(item)">
+    <div flex class="md-list-item-text series-box">
+      <div class="series-row">
+        <div class="series-item">
+          <h3 class="h3-b">{{item.name}}</h3>
+        </div>
+        <div class="rcorners1" ng-show="current_user_id != item.user_id">{{item.username}}'s series</div>
+      </div>
+      <div>
+        <h4 class="h4-b">{{item.description}}</h4>
+      </div>
+      <div>
+        <p class="p-b">Seasons: {{item.seasons}}</p>
+      </div>
+    </div>
+    <div flex="20" ng-if="isEditable && current_user_id == item.user_id">
+      <md-button class="md-fab md-accent fab-relative-offset" ng-click="loadSeriesEdit(item)">
+        <md-icon class="material-icons">build</md-icon>
+      </md-button>
+    </div>
+  <md-divider></md-divider>
+  </md-list-item>
+  <md-list-item ng-show="!(series.length > 0)">
+    <span>
+      <p>No series here.</p>
+    </span>
+  </md-list-item>
+</div>
+
+<md-button class="md-fab md-primary fab-offset" ng-click="isEditable = !isEditable">
+  <md-icon class="material-icons" ng-show="isEditable">create</md-icon>
+  <md-icon class="material-icons" ng-show="!isEditable">visibility</md-icon>
+</md-button>

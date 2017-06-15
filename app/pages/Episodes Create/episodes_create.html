@@ -1,0 +1,49 @@
+<md-content layout="row" layout-align="space-around" layout-padding="layout-padding" ng-cloak="ng-cloak" class="login-form">
+  <md-card flex="flex" flex-gt-sm="50" flex-gt-md="33">
+    <md-toolbar>
+      <div class="md-toolbar-tools">
+        <md-button><md-icon class="material-icons" ui-sref="nav.episodes">keyboard_return</md-icon></md-button><h2><span>Create Episode</span></h2>
+      </div>
+    </md-toolbar>
+
+    <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="isLoading"></md-progress-linear>
+
+    <md-card-content>
+      <form name="Form">
+        <md-input-container class="md-block">
+          <label>Name</label>
+          <input type="text" name="name" ng-model="body.name" placeholder="Doctor Who" ng-disabled="isLoading" required="" />
+          <div ng-messages="Form.name.$error" role="alert" multiple="">
+            <div ng-message="required" class="my-message">Enter name</div>
+          </div>
+        </md-input-container>
+        <md-input-container class="md-block">
+          <label>Description</label>
+          <input type="text" name="description" ng-model="body.description" placeholder="A big ball of wibbly wobbly, timey wimey stuff" ng-disabled="isLoading" required="" />
+          <div ng-messages="Form.description.$error" role="alert" multiple="">
+            <div ng-message="required" class="my-message">Enter description</div>
+          </div>
+        </md-input-container>
+        <md-input-container class="md-block">
+          <label>Season Number</label>
+          <input type="number" name="season" ng-model="body.season" placeholder="1" step="1" ng-disabled="isLoading" required="">
+          <div ng-messages="Form.season.$error" role="alert" multiple="">
+            <div ng-message="required" class="my-message">Enter season number</div>
+          </div>
+        </md-input-container>
+        <md-input-container class="md-block">
+          <label>Episode Number</label>
+          <input type="number" name="episode" ng-model="body.episode" placeholder="1" step="1" ng-disabled="isLoading" required="">
+          <div ng-messages="Form.episode.$error" role="alert" multiple="">
+            <div ng-message="required" class="my-message">Enter episode number</div>
+          </div>
+        </md-input-container>
+
+        <span md-colors="{color:'warn'}" ng-show="message">{{message}}<br><br></span>
+        <span ng-show="message_success">{{message_success}}<br><br></span>
+
+        <md-button ng-disabled="!Form.$valid || isLoading" ng-click="create()" class="md-raised md-primary">&nbsp Create &nbsp</md-button>
+      </form>
+    </md-card-content>
+  </md-card>
+</md-content>

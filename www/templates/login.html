@@ -1,0 +1,37 @@
+<md-content layout="row" layout-align="space-around" layout-padding="layout-padding" ng-cloak="ng-cloak" class="login-form">
+  <md-card flex="flex" flex-gt-sm="50" flex-gt-md="33">
+    <md-toolbar>
+      <div class="md-toolbar-tools">
+        <h2><span>Login Form</span></h2>
+      </div>
+    </md-toolbar>
+
+    <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="isLoading"></md-progress-linear>
+
+    <md-card-content>
+      <form name="Form">
+        <md-input-container class="md-block">
+          <label>Username</label>
+          <input type="text" name="username" ng-model="username" placeholder="username" ng-disabled="isLoading" required="" />
+          <div ng-messages="Form.username.$error" role="alert" multiple="">
+            <div ng-message="required" class="my-message">Username</div>
+          </div>
+        </md-input-container>
+        <md-input-container class="md-block">
+          <label>Password</label>
+          <input type="password" name="password" ng-model="password" placeholder="password" ng-disabled="isLoading" required="" />
+          <div ng-messages="Form.password.$error" role="alert" multiple="">
+            <div ng-message="required" class="my-message">Password</div>
+          </div>
+        </md-input-container>
+
+        <span ng-show="register_message">{{register_message}}<br><br></span>
+        <span md-colors="{color:'warn'}" ng-show="message">{{message}}<br><br></span>
+
+        <md-button ng-disabled="!Form.$valid || isLoading" ng-click="login()" class="md-raised md-primary">&nbsp Login &nbsp</md-button>
+
+        <md-button class="md-accent" ui-sref="register">Register</md-button>
+      </form>
+    </md-card-content>
+  </md-card>
+</md-content>

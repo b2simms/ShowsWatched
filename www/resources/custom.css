@@ -1,0 +1,110 @@
+.md-toolbar-tools {
+    background-color: blue;
+    color: white;
+}
+.scrollable {
+    left:0;
+    top: 0; 
+    overflow: auto; 
+    min-height:auto;
+    max-height:100%;
+}
+.small-button {
+    margin: 0;
+    max-width: 100%;
+    min-width: 0;
+}
+.md-subheader .md-subheader-inner {
+    padding: 8px;
+    font-size: 16px;
+}
+::-webkit-scrollbar {
+    width: 0;
+}
+.fab-offset {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+}
+.box-slim {
+    position: absolute;
+    right: 0px;
+    bottom: 0px;
+    height: 100%;
+}
+.fab-relative-offset {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+}
+.fab-top-offset {
+    position: absolute;
+    top: 0px;
+    right: 10px;
+}
+.rcorners1 {
+    float: right;
+    border-radius: 25px;
+    background: green;
+    padding: 0px 7px; 
+    margin: 1px 0px 0px 5px;
+    min-width: 50px;
+    text-align: center;
+    color: white;
+    font-size: 12px;
+    line-height: 20px;
+}
+.corner-blue {
+    background: blue;
+}
+.corner-orange {
+    background: orangered;
+}
+.series-box {
+    width: 100%;
+}
+.series-row {
+    width: 100%;
+    display: inline-block;
+}
+.series-item {
+    float: left;
+}
+.series-item h3 {
+    margin: 5px 0px;
+}
+.episode-info {
+    margin: 5px 0px;
+    padding: 5px;
+}
+.md-button.md-raised.blue {
+    background-color: white;
+    color: blue;
+}
+.md-button.md-raised.orange {
+    background-color: white;
+    color: orangered;
+}
+.md-button.md-accent.md-raised {
+    color: white;
+}
+.md-button.md-accent.md-fab:not([disabled]) md-icon {
+    color: white;
+}
+.padded {
+    padding: 10px;
+    margin: 10px;
+}
+
+md-list-item.md-3-line .md-list-item-text h3, md-list-item.md-3-line > .md-no-style .md-list-item-text h3 {
+    overflow: visible;
+    white-space: normal;
+}
+md-list-item.md-3-line .md-list-item-text h4, md-list-item.md-3-line > .md-no-style .md-list-item-text h4 {
+    overflow: visible;
+    white-space: normal;
+}
+md-list-item.md-3-line .md-list-item-text p, md-list-item.md-3-line > .md-no-style .md-list-item-text p {
+    overflow: visible;
+    white-space: normal;
+}

@@ -1,0 +1,52 @@
+<div layout-align="space-around" layout-padding="layout-padding" ng-cloak="ng-cloak" class="login-form">
+  <div flex="flex" flex-gt-sm="80" flex-gt-md="80" class="md-padding">
+    <div hide show-gt-sm flex>
+      <md-toolbar class="layout-gt-sm">
+        <div class="md-toolbar-tools" layout="row">
+          <div flex="66" layout="row">
+            <h2>{{title}}</h2>
+            <section layout="row" layout-align="start stretch">
+              <md-button ng-disabled="button[0]" ng-click="open(0)">My Lists</md-button>
+              <md-button ng-disabled="button[1]" ng-click="open(1)">Create Series</md-button>
+            </section>
+          </div>
+          <div flex="33" layout="row" layout-align="end center">
+            <md-button class="md-accent" ui-sref="login">Logout</md-button>
+          </div>
+        </div>
+      </md-toolbar>
+    </div>
+
+    <div hide-gt-sm flex>
+      <div class="md-toolbar-tools" layout="row">
+        <div flex="66" layout="row">
+          <h2>{{title}}</h2>
+        </div>
+        <div flex="33" layout="row" layout-align="end center">
+          <md-menu-bar>
+            <md-menu>
+              <i class="material-icons" style="font-size:38px;" ng-click="$mdMenu.open()">view_list</i>
+              <md-menu-content>
+                <md-menu-item>
+                  <i class="material-icons" flex="20">featured_play_list</i>
+                  <md-button ng-click="open(0)">{{series_name}}</md-button>
+                </md-menu-item>
+                <md-menu-item>
+                  <i class="material-icons" flex="20">build</i>
+                  <md-button ng-click="open(1)">{{manage_name}}</md-button>
+                </md-menu-item>
+                <md-menu-item>
+                  <i class="material-icons" style="color:orangered" flex="20">exit_to_app</i>
+                  <md-button class="md-accent" ui-sref="login">Logout</md-button>
+                </md-menu-item>
+              </md-menu-content>
+            </md-menu>
+          </md-menu-bar>
+        </div>
+      </div>
+    </div>
+
+    <ui-view></ui-view>
+    
+  </div>
+</div>

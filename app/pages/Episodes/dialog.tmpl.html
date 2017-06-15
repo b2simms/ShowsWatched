@@ -1,0 +1,42 @@
+<md-dialog aria-label="List dialog">
+    <md-dialog-content>
+        <div>
+            <div>
+                <md-whiteframe class="md-whiteframe-10dp" layout="column" layout-align="center center">
+                    <h3 class="episode-info">{{episode.name}}</h3>
+                    <h4 class="episode-info">Episode {{ episode.episode }}</h4>
+                    <p class="episode-info">{{episode.description}}</p>
+                </md-whiteframe>
+            </div>
+
+            <div ng-if="checkIfWatched(episode)">
+                <md-whiteframe class="md-whiteframe-1dp padded" layout="column" layout-align="center center">
+                    <span>This episode has been watched</span>
+                    <md-button class="md-raised blue md-hue-1" ng-if="checkIfOwner()" ng-click="unWatchEpisode(episode)">Unwatch Episode</md-button>
+                </md-whiteframe>
+            </div>
+            <div ng-if="!checkIfWatched(episode)">
+                <md-whiteframe ng-click="checkIfOwner() && watchEpisode(episode)" class="md-whiteframe-1dp padded" layout="column" layout-align="center center">
+                    <md-button class="md-raised blue">Watch Episode</md-button>
+                </md-whiteframe>
+                
+                <div ng-if="!checkIfClaimed(episode)">
+                    <md-whiteframe class="md-whiteframe-1dp padded" layout="column" layout-align="center center">
+                        <md-button class="md-raised orange" ng-click="claimEpisode(episode)">Claim Episode</md-button>
+                    </md-whiteframe>
+                </div>
+                <div ng-if="checkIfClaimed(episode)">
+                    <md-whiteframe class="md-whiteframe-1dp padded" layout="column" layout-align="center center">                  
+                        <span>Claimed by {{episode.assigned_name}}</span>
+                        <md-button class="md-raised orange md-hue-1" ng-click="unClaimEpisode(episode)">Unclaim Episode</md-button>
+                    </md-whiteframe>
+                </div>
+            </div>
+        </div>
+    </md-dialog-content>
+    <md-dialog-actions>
+        <md-button ng-click="closeDialog()" class="md-primary">
+            Close
+        </md-button>
+    </md-dialog-actions>
+</md-dialog>
