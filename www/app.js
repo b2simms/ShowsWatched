@@ -59,6 +59,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
     })
     .state('series_create', {
         url: '/series_create',
+        params: {'name':null,'description':null,'preexisting_id':null},
         templateUrl: 'templates/series_create.html',
         controller: 'SeriesCreateCtrl'
     })
@@ -66,6 +67,11 @@ app.config(function($stateProvider, $urlRouterProvider) {
         url: '/series_edit',
         templateUrl: 'templates/series_edit.html',
         controller: 'SeriesEditCtrl'
+    })
+     .state('series_preexisting', {
+        url: '/series_preexisting',
+        templateUrl: 'templates/series_preexisting.html',
+        controller: 'SeriesPreexistingCtrl'
     })
     .state('nav.episodes', {
         url: '/episodes',
@@ -147,7 +153,12 @@ function userService($http, API, auth) {
     return $http.get(API + '/series/list')
   }
   self.createSeries = function (body) {
-    return $http.post(API + '/series', body)
+    debugger;
+    if (body.preexisting_id != null) {
+      return $http.post(API + '/series/' + body.preexisting_id, body);
+    } else {
+      return $http.post(API + '/series', body);
+    }
   };
   self.updateSeries = function (id, body) {
     return $http.put(API + '/series/' + id, body)
@@ -156,7 +167,7 @@ function userService($http, API, auth) {
     return $http.delete(API + '/series/' + id)
   };
   self.createEpisode = function (id, body) {
-    return $http.post(API + '/series/'+id+'/episodes', body)
+    return $http.post(API + '/series/' + id + '/episodes', body)
   };
   self.updateEpisode = function (id, body) {
     return $http.put(API + '/episodes/' + id, body)
@@ -165,18 +176,23 @@ function userService($http, API, auth) {
     return $http.delete(API + '/episodes/' + id)
   };
   self.claimEpisode = function (id) {
-    return $http.put(API + '/episodes/'+id+'/claim')
+    return $http.put(API + '/episodes/' + id + '/claim')
   };
   self.unClaimEpisode = function (id) {
-    return $http.delete(API + '/episodes/'+id+'/claim')
+    return $http.delete(API + '/episodes/' + id + '/claim')
   };
   self.watchEpisode = function (id) {
-    return $http.put(API + '/episodes/'+id+'/watch')
+    return $http.put(API + '/episodes/' + id + '/watch')
   };
   self.unWatchEpisode = function (id) {
-    return $http.delete(API + '/episodes/'+id+'/watch')
+    return $http.delete(API + '/episodes/' + id + '/watch')
   };
-
+  self.searchPrexistingSeries = function (queryParam) {
+    return $http.get(API + '/external/search/' + queryParam)
+  };
+  self.refreshEpisodes = function (series_id, body) {
+    return $http.put(API + '/external/episodes/'+series_id+'/refresh', body)
+  };
 }
 app.controller('EpisodesCtrl', ['$rootScope','$scope', '$state', 'user', 'auth', '$mdDialog', '$q', 'localStorageService', '$window', '$location',
 function ($rootScope, $scope, $state, user, auth, $mdDialog, $q, localStorageService, $window, $location) {
@@ -219,6 +235,36 @@ function ($rootScope, $scope, $state, user, auth, $mdDialog, $q, localStorageSer
       return true;
     }
     return false;
+  }
+  $scope.checkIfPreexisting = function(){
+    var series_is_preexisting = localStorageService.get('series_is_preexisting');
+    if(series_is_preexisting > 0){
+      return true;
+    }
+    return false;
+  }
+
+  $scope.refreshEpisodes = function(){
+    $scope.isLoading = true;
+    series_id = localStorageService.get('series_id');
+    var body = {};
+    body.series_is_preexisting = localStorageService.get('series_is_preexisting');
+    return user.refreshEpisodes(series_id, body)
+    .then(function (res) {
+      loadSeriesAll();
+    })
+    .catch(function (err) {
+      if (err.data && err.data.message) {
+        showAlert(err.data.message);
+      } if (err.message) {
+        showAlert(err.message);
+      } else {
+        showAlert("Something went wrong");
+      }
+    })
+    .finally(function () {
+      $scope.isLoading = false;
+    })
   }
 
   $scope.loadEpisodesEdit = function(season, item){
@@ -288,16 +334,24 @@ function ($rootScope, $scope, $state, user, auth, $mdDialog, $q, localStorageSer
       locals: {
         episode: episode,
         checkIfOwner: $scope.checkIfOwner,
-        setLoading: $scope.setLoading
+        setLoading: $scope.setLoading,
+        localStorageService: localStorageService
       },
       controller: DialogController,
       clickOutsideToClose:true
     });
-    function DialogController($scope, $mdDialog, episode, checkIfOwner, setLoading) {
+    function DialogController($scope, $mdDialog, episode, checkIfOwner, setLoading, localStorageService) {
       $scope.episode = episode;
       $scope.checkIfOwner = checkIfOwner;
       $scope.checkIfClaimed = function(episode){
         if(!angular.equals(episode.claimed_by_user,'0')){
+          return true;
+        }
+        return false;
+      }
+      $scope.checkIfClaimedByUser = function (episode){
+        var current_user_id = localStorageService.get('user_id');
+        if(angular.equals(episode.claimed_by_user, current_user_id)){
           return true;
         }
         return false;
@@ -634,6 +688,7 @@ function($rootScope, $scope, $state, user, auth, $mdDialog, $q, localStorageServ
      localStorageService.set("series_name",item.name);
      localStorageService.set("series_user_id",item.user_id);
      localStorageService.set("series_is_private",item.is_private);
+     localStorageService.set('series_is_preexisting',item.preexisting_id);
      $state.go('nav.episodes');
   }
 
@@ -660,16 +715,25 @@ function($rootScope, $scope, $state, user, auth, $mdDialog, $q, localStorageServ
 app.controller('SeriesCreateCtrl', ['$scope', '$state', 'user','auth', function($scope, $state, user, auth) {
   
   $scope.body = {};
+
+  $scope.isPreexisting = false;
+  if($state.params.name != null){
+    $scope.isPreexisting = true;
+    $scope.body.name = $state.params.name;
+    $scope.body.description = $state.params.description;
+    $scope.body.preexisting_id = $state.params.preexisting_id;
+  }
+
   $scope.body.is_private = false;
 
   console.log("SeriesCreateCtrl called.");
 
   $scope.create = function() {
     $scope.isLoading = true;
-    debugger;
     $scope.body.is_private = $scope.body.is_private ? 'T':'F';
     user.createSeries($scope.body)
       .then(function(res){
+        debugger;
         $scope.message_success = "Series created successfully!";
         setTimeout(function(){ 
           $scope.isLoading = false;
@@ -677,6 +741,7 @@ app.controller('SeriesCreateCtrl', ['$scope', '$state', 'user','auth', function(
         }, 1800);
       })
       .catch(function(err){
+        debugger;
         try{
           console.log(err);
           $scope.message = err.data.message;
@@ -767,4 +832,42 @@ function ($rootScope, $scope, $state, user, auth, $mdDialog) {
       })
   }
 
+}]);
+app.controller('SeriesPreexistingCtrl', ['$scope', '$state', 'user', 'auth', function ($scope, $state, user, auth) {
+
+  $scope.search = "";
+
+  console.log("SeriesPreexistingCtrl called.");
+
+  $scope.search = function () {
+    $scope.isLoading = true;
+    user.searchPrexistingSeries($scope.name)
+      .then(function (res) {
+        $scope.results = res.data;
+      })
+      .catch(function (err) {
+        try {
+          console.log(err);
+          $scope.message = err.data.message;
+        } catch (err) {
+          console.log(err);
+          $scope.message = "Cannot find series - please contact system admin";
+        } finally {
+          $scope.isLoading = false;
+        }
+      })
+      .finally(function () {
+        $scope.isLoading = false;
+      });
+  }
+
+  $scope.createSeries = function (series) {
+    $state.go('series_create',
+      {
+        'name': series.name,
+        'description': series.description,
+        'preexisting_id': series.id
+      }
+    );
+  }
 }]);

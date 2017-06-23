@@ -9,9 +9,9 @@ include_once '../resource/ErrorHandler.php';
 require_once('../resource/TokenAuth.php');
 include_once('../resource/User.php');
 include_once('../resource/TVShows.php');
+include_once('../resource/TVShowsExternal.php');
 
-header("Access-Control-Allow-Origin: http://localhost");
-header('Access-Control-Allow-Methods: GET, PUT, POST, DELETE');
+header("Access-Control-Allow-Origin: *");
 header('Access-Control-Allow-Methods: GET, PUT, POST, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Content-Range, Content-Disposition, Content-Description, Authorization');
 header('Content-type:application/json;charset=utf-8');
@@ -34,7 +34,21 @@ $app->get('/series/list', function (Request $request, Response $response) use ($
     return series_all($request, $response, $db);
 });
 $app->post('/series', function (Request $request, Response $response) use ($db) {
-    return series_create($request, $response, $db);
+    return series_create($request, $response, $db, null);
+});
+$app->post('/series/{id}', function (Request $request, Response $response, $args) use ($db) {
+    $responseOnCreate = series_create($request, $response, $db, $args['id']);
+    if($responseOnCreate->getStatusCode() != 200){
+        return $isCreated;
+    }
+    $series_id = json_decode($responseOnCreate->getBody())->last_id;
+    
+    $newSeries = external_episodes_get($args['id']);
+    $mergedSeries = external_episodes_merge($newSeries, $series_id, $db);
+    $user_id = $request->getAttribute('user_id');
+
+    return external_series_insert($response, $user_id, $series_id, $mergedSeries, $db);
+
 });
 $app->put('/series/{id}', function (Request $request, Response $response, $args) use ($db) {
     return series_update($request, $response, $args['id'], $db);
@@ -63,11 +77,19 @@ $app->put('/episodes/{id}/claim', function (Request $request, Response $response
 $app->delete('/episodes/{id}/claim', function (Request $request, Response $response, $args) use ($db) {
     return episodes_claim($request, $response, $args['id'], $db, false);
 });
+$app->get('/external/search/{name}', function (Request $request, Response $response, $args) use ($db) {
+    return external_series_get($request, $response, $args['name'], $db);
+});
+$app->put('/external/episodes/{id}/refresh', function (Request $request, Response $response, $args) use ($db) {
+    return external_episodes_refresh($request, $response, $args['id'], $db);
+});
 
+$app->get('/test/episodes/{id}', function (Request $request, Response $response, $args) use ($db) {
+    return external_episodes_get($request, $response, $args['id'], $db);
+});
 $app->get('/test', function (Request $request, Response $response) {
 
     $output = new stdClass();    
-    $output->user_id = $request->getAttribute('user_id');
     $output->time = time();
     $myJson = json_encode($output);
     $response->getBody()->write($myJson);

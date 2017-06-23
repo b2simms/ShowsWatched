@@ -8,41 +8,31 @@ function series_get(Request $request, Response $response, $db) {
     $user_id = $request->getAttribute('user_id');
     $sqlQuery = "SELECT s.*, COUNT(DISTINCT e.season) as seasons, u.username 
         FROM series s LEFT JOIN episodes e 
-        ON e.series_id = s.id AND e.is_deleted != 'T' 
+        ON e.series_id = s.id AND e.deleted_date = '0000-00-00 00:00:00'
         JOIN users u ON s.user_id = u.id 
         WHERE (s.user_id = :user_id or s.is_private != 'T') 
-        AND s.is_deleted != 'T' 
+        AND s.deleted_date = '0000-00-00 00:00:00'
         GROUP BY s.id";
     $params = array(':user_id' => $user_id);
     $data = db_get($db, $sqlQuery, $params);
 
-    $seriesArr = array();
-    if(!empty($data)){
-        foreach ($data as $row) {
-            $obj = new stdClass();
-            $obj->id = $row['id'];
-            $obj->name = $row['name'];
-            $obj->description = $row['description'];
-            $obj->user_id = $row['user_id'];
-            $obj->is_private = $row['is_private'];
-            $obj->seasons = $row['seasons'];
-            $obj->username = $row['username'];
-            $seriesArr[] = $obj;
-        }
-        unset($row); // break the reference with the last element
-    }
-    return $response->getBody()->write(json_encode($seriesArr));
+    return $response->getBody()->write(json_encode($data));
 }
 
 function series_all(Request $request, Response $response, $db) {
 
     $user_id = $request->getAttribute('user_id');
 
+    $series = getSeriesAll($user_id, $db);
+    return $response->getBody()->write(json_encode($series));
+}
+
+function getSeriesAll($user_id, $db){
     $sqlQuery = "SELECT e.*, s.name as s_name, s.description as s_description, s.user_id as s_user_id, s.is_private as s_is_private 
         FROM episodes e LEFT JOIN series s ON e.series_id = s.id 
         WHERE (user_id = :user_id OR s.is_private != 'T')
-        AND e.is_deleted != 'T' 
-        AND s.is_deleted != 'T'
+        AND e.deleted_date = '0000-00-00 00:00:00' 
+        AND s.deleted_date = '0000-00-00 00:00:00'
         ORDER BY series_id, season, episode";
     $statement = $db->prepare($sqlQuery);
     $statement->execute(array(':user_id' => $user_id));
@@ -81,7 +71,7 @@ function series_all(Request $request, Response $response, $db) {
                 "assigned_name":"Emilynn",
                 "series_id":"1",
                 "description":"0",
-                "is_deleted":"F",
+                "deleted_date":"0000:00:00 00:00:00",
                 "is_watched":"F",
                 "claimed_by_user":"0",
                 "s_name":"Doctor Who",
@@ -104,7 +94,7 @@ function series_all(Request $request, Response $response, $db) {
             $episodeObj->date = $row['date'];
             $episodeObj->name = $row['name'];
             $episodeObj->description = $row['description'];
-            $episodeObj->is_deleted = $row['is_deleted'];
+            $episodeObj->deleted_date = $row['deleted_date'];
             $episodeObj->is_watched = $row['is_watched'];
             $episodeObj->claimed_by_user = $row['claimed_by_user'];
             $episodeObj->assigned_name = $row['assigned_name'];
@@ -112,10 +102,10 @@ function series_all(Request $request, Response $response, $db) {
             $series[$seriesPos]->seasons[$seasonPos]->episodes[] = $episodeObj;
         }
     }
-    return $response->getBody()->write(json_encode($series));
+    return $series;
 }
 
-function series_create(Request $request, Response $response, $db) {
+function series_create(Request $request, Response $response, $db, $preexisting_id) {
     $body = $request->getBody();
     $input = json_decode($body);
     $user_id = $request->getAttribute('user_id');
@@ -138,15 +128,25 @@ function series_create(Request $request, Response $response, $db) {
     $description = $input->description;
     $name = $input->name;
 
+    if(!isset($preexisting_id)){
+        $preexisting_id = null;
+    }
+
     try{
         //enter new user into the database
-        $sqlInsert = "INSERT INTO series (id, user_id, is_private, description, name, is_deleted) 
-            VALUES (NULL, :user_id, :is_private, :description, :name, 'F')";
+        $sqlInsert = "INSERT INTO series (id, user_id, is_private, description, name, deleted_date, preexisting_id) 
+            VALUES (NULL, :user_id, :is_private, :description, :name, 'F', :preexisting_id)";
         $stmt = $db->prepare($sqlInsert);
-        $stmt->execute(array(':user_id' => $user_id, ':is_private' => $is_private, ':description' => $description, ':name'=> $name));
+        $stmt->execute(array(':user_id' => $user_id, ':is_private' => $is_private, ':description' => $description, ':name'=> $name, ':preexisting_id' => $preexisting_id));
         if(!$stmt->rowCount()){
             throw new PDOException('Series not created.');
         }
+        $sqlGet = 'SELECT LAST_INSERT_ID()';
+        $stmt = $db->prepare($sqlGet);
+        $stmt->execute();
+        $row = $stmt->fetch();
+        $obj = new stdClass();
+        $obj->last_id = $row['0'];
     }catch (PDOException $e) {
         if ($e->getCode() == 23000) {
             // Take some action if there is a key constraint violation, i.e. duplicate name
@@ -157,6 +157,7 @@ function series_create(Request $request, Response $response, $db) {
     }catch(Exception $e){
         return error422($response, "Unsuccessful creation of series: ".$e->getMessage());
     }
+    $response->getBody()->write(json_encode($obj));
     return $response;
 }
 
@@ -186,7 +187,7 @@ function series_update(Request $request, Response $response, $id, $db) {
     try{
         //enter new user into the database
         $sqlInsert = "UPDATE series SET is_private = :is_private, description = :description, name = :name
-            WHERE id = :id AND user_id = :user_id AND is_deleted != 'T'";
+            WHERE id = :id AND user_id = :user_id AND deleted_date = '0000-00-00 00:00:00'";
         $stmt = $db->prepare($sqlInsert);
         $stmt->execute(array(':is_private' => $is_private, ':description' => $description, ':name' => $name, ':id' => $id, ':user_id' => $user_id));
         if(!$stmt->rowCount()){
@@ -214,7 +215,7 @@ function series_delete(Request $request, Response $response, $id, $db) {
         $sqlQuery = "SELECT * FROM series 
             WHERE id = :id
             AND user_id = :user_id 
-            AND is_deleted != 'T'";
+            AND deleted_date = '0000-00-00 00:00:00'";
         $stmt = $db->prepare($sqlQuery);
         $stmt->execute(array(':id' => $id, ':user_id' => $user_id));
 
@@ -223,7 +224,7 @@ function series_delete(Request $request, Response $response, $id, $db) {
         }
 
         //enter new user into the database
-        $sqlInsert = "UPDATE series SET is_deleted = 'T'
+        $sqlInsert = "UPDATE series SET deleted_date = now()
             WHERE id = :id";
         $stmt = $db->prepare($sqlInsert);
         $stmt->execute(array(':id' => $id));
@@ -271,7 +272,7 @@ function episodes_create(Request $request, Response $response, $series_id, $db) 
         $sqlQuery = "SELECT * FROM series
             WHERE id = :id 
             AND user_id = :user_id
-            AND is_deleted != 'T'";
+            AND deleted_date = '0000-00-00 00:00:00'";
         $stmt = $db->prepare($sqlQuery);
         $stmt->execute(array(':id' => $series_id, ':user_id' => $user_id));
         if($stmt->rowCount() == 0){
@@ -331,8 +332,8 @@ function episodes_update(Request $request, Response $response, $id, $db) {
          $sqlQuery = "SELECT * FROM episodes e JOIN series s on s.id = e.series_id 
             WHERE e.id = :id 
             AND s.user_id = :user_id
-            AND e.is_deleted != 'T' 
-            AND s.is_deleted != 'T'";
+            AND e.deleted_date = '0000-00-00 00:00:00' 
+            AND s.deleted_date = '0000-00-00 00:00:00'";
         $stmt = $db->prepare($sqlQuery);
         $stmt->execute(array(':id' => $id, ':user_id' => $user_id));
         if($stmt->rowCount() == 0){
@@ -369,8 +370,8 @@ function episodes_watch(Request $request, Response $response, $id, $db, $is_watc
         $sqlQuery = "SELECT * FROM episodes e JOIN series s on s.id = e.series_id 
             WHERE e.id = :id 
             AND s.user_id = :user_id 
-            AND e.is_deleted != 'T' 
-            AND s.is_deleted != 'T'";
+            AND e.deleted_date = '0000-00-00 00:00:00' 
+            AND s.deleted_date = '0000-00-00 00:00:00'";
         $stmt = $db->prepare($sqlQuery);
         $stmt->execute(array(':id' => $id, ':user_id' => $user_id));
 
@@ -405,18 +406,24 @@ function episodes_claim(Request $request, Response $response, $id, $db, $claim) 
             WHERE e.id = :id
             AND e.is_watched != 'T'
             AND s.is_private != 'T' 
-            AND e.is_deleted != 'T' 
-            AND s.is_deleted != 'T'";
+            AND e.deleted_date = '0000-00-00 00:00:00' 
+            AND s.deleted_date = '0000-00-00 00:00:00'";
+            
+        $params = array();
+        $params[':id'] = $id;
         if($claim){
-            $sqlQuery .=" AND e.claimed_by_user <> '0'";
+            $sqlQuery .=" AND e.claimed_by_user = :user_id";
+            $params[':user_id'] = $user_id;
         }else{
             $sqlQuery .=" AND e.claimed_by_user = '0'";
+            
         }
         $stmt = $db->prepare($sqlQuery);
-        $stmt->execute(array(':id' => $id));
+        $stmt->execute($params);
+
         if($stmt->rowCount() > 0){
             //the episode has been claimed or watched or the series is not public"
-            return error422($response,"The episode has been claimed or watched or the series is not public");
+            return error422($response,"The episode has been claimed by someone else");
         }
 
         //build call based on claim episode condition
@@ -452,8 +459,8 @@ function episodes_delete(Request $request, Response $response, $id, $db) {
         $sqlQuery = "SELECT * FROM episodes e JOIN series s on s.id = e.series_id 
             WHERE e.id = :id 
             AND s.user_id = :user_id 
-            AND e.is_deleted != 'T' 
-            AND s.is_deleted != 'T'";
+            AND e.deleted_date = '0000-00-00 00:00:00' 
+            AND s.deleted_date = '0000-00-00 00:00:00'";
         $stmt = $db->prepare($sqlQuery);
         $stmt->execute(array(':id' => $id, ':user_id' => $user_id));
 
@@ -462,7 +469,7 @@ function episodes_delete(Request $request, Response $response, $id, $db) {
         }
 
         //enter new user into the database
-        $sqlInsert = "UPDATE episodes SET is_deleted = 'T'
+        $sqlInsert = "UPDATE episodes SET deleted_date = now()
             WHERE id = :id";
         $stmt = $db->prepare($sqlInsert);
         $stmt->execute(array(':id' => $id));

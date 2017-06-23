@@ -23,6 +23,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
     })
     .state('series_create', {
         url: '/series_create',
+        params: {'name':null,'description':null,'preexisting_id':null},
         templateUrl: 'templates/series_create.html',
         controller: 'SeriesCreateCtrl'
     })
@@ -30,6 +31,11 @@ app.config(function($stateProvider, $urlRouterProvider) {
         url: '/series_edit',
         templateUrl: 'templates/series_edit.html',
         controller: 'SeriesEditCtrl'
+    })
+     .state('series_preexisting', {
+        url: '/series_preexisting',
+        templateUrl: 'templates/series_preexisting.html',
+        controller: 'SeriesPreexistingCtrl'
     })
     .state('nav.episodes', {
         url: '/episodes',

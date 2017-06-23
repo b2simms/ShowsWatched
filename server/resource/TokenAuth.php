@@ -8,7 +8,7 @@ class TokenAuth
 
     public function __construct($key) {
         //Define the urls that you want to exclude from Authentication, aka public urls     
-        $this->whiteList = array('\/auth\/login', '\/auth\/register');
+        $this->whiteList = array('\/auth\/login', '\/auth\/register','\/test');
         $this->key = $key;
     }
 

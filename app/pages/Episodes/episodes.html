@@ -12,8 +12,12 @@
     </md-input-container>
   </div>
 
-  <div layout="row">
-    <md-button layout="column" class="md-raised md-accent" ng-show="isEditable && checkIfOwner()" ui-sref="episodes_create">Create New Episode</md-button>
+  <div layout="column">
+    <md-button class="md-raised md-accent" ng-show="isEditable && checkIfOwner()" ui-sref="episodes_create">Create New Episode</md-button>
+    <md-button class="md-accent" ng-show="isEditable && checkIfPreexisting()" ng-click="refreshEpisodes()">
+      <md-icon class="material-icons">autorenew</md-icon>
+      Update from tvmaze.com
+    </md-button>
   </div>
 
   <md-progress-linear md-mode="indeterminate" ng-show="isLoading"></md-progress-linear>

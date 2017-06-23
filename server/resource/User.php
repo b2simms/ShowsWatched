@@ -11,7 +11,7 @@ function login(Request $request, Response $response, $db, $key) {
     $user = $input->username;
     $password = $input->password;
 
-    $sqlQuery = "SELECT * FROM users WHERE username = :username AND is_deleted != 'T'";
+    $sqlQuery = "SELECT * FROM users WHERE username = :username AND deleted_date = '0000-00-00 00:00:00'";
     $statement = $db->prepare($sqlQuery);
     $statement->execute(array(':username' => $user));
 

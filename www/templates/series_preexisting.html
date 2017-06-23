@@ -1,0 +1,48 @@
+<md-content layout="row" layout-align="space-around" layout-padding="layout-padding" ng-cloak="ng-cloak" class="login-form">
+  <md-card flex="flex" flex-gt-sm="50" flex-gt-md="33">
+    <md-toolbar>
+      <div class="md-toolbar-tools">
+        <md-button>
+          <md-icon class="material-icons" ui-sref="series_create">keyboard_return</md-icon>
+        </md-button>
+        <h2><span>Create from Preexisting</span></h2>
+      </div>
+    </md-toolbar>
+
+    <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="isLoading"></md-progress-linear>
+
+    <md-card-content>
+      <form name="Form">
+        <md-input-container class="md-block">
+          <label>Search by Series name</label>
+          <input type="text" name="name" ng-model="name" placeholder="Doctor Who" ng-disabled="isLoading" required="" />
+          <div ng-messages="Form.name.$error" role="alert" multiple="">
+            <div ng-message="required" class="my-message">Enter series name</div>
+          </div>
+        </md-input-container>
+
+        <span md-colors="{color:'warn'}" ng-show="message">{{message}}<br><br></span>
+        <span ng-show="message_success">{{message_success}}<br><br></span>
+
+        <md-button ng-disabled="!Form.$valid || isLoading" ng-click="search()" class="md-raised md-primary">&nbsp Search &nbsp</md-button>
+      </form>
+    </md-card-content>
+    <div class="scrollable" ng-style="{height: hgt+ 'px'}">
+      <md-list-item class="md-3-line" ng-repeat="series in results" ng-click="createSeries(series)">
+        <div flex class="md-list-item-text series-box">
+          <md-whiteframe class="md-whiteframe-5dp padded-sm" layout="column">
+            <div class="series-row">
+              <div class="series-item">
+                <h3><b>{{ series.name }}</b></h3>
+              </div>
+            </div>
+            <div>
+              <p>{{ series.description }}</p>
+            </div>
+          </md-whiteframe>
+        </div>
+        <md-divider md-inset></md-divider>
+      </md-list-item>
+    </div>
+  </md-card>
+</md-content>

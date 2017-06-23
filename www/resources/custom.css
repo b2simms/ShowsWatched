@@ -95,6 +95,9 @@
     padding: 10px;
     margin: 10px;
 }
+.padded-sm {
+    padding: 10px;
+}
 
 md-list-item.md-3-line .md-list-item-text h3, md-list-item.md-3-line > .md-no-style .md-list-item-text h3 {
     overflow: visible;

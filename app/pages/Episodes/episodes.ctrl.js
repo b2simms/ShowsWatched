@@ -40,6 +40,36 @@ function ($rootScope, $scope, $state, user, auth, $mdDialog, $q, localStorageSer
     }
     return false;
   }
+  $scope.checkIfPreexisting = function(){
+    var series_is_preexisting = localStorageService.get('series_is_preexisting');
+    if(series_is_preexisting > 0){
+      return true;
+    }
+    return false;
+  }
+
+  $scope.refreshEpisodes = function(){
+    $scope.isLoading = true;
+    series_id = localStorageService.get('series_id');
+    var body = {};
+    body.series_is_preexisting = localStorageService.get('series_is_preexisting');
+    return user.refreshEpisodes(series_id, body)
+    .then(function (res) {
+      loadSeriesAll();
+    })
+    .catch(function (err) {
+      if (err.data && err.data.message) {
+        showAlert(err.data.message);
+      } if (err.message) {
+        showAlert(err.message);
+      } else {
+        showAlert("Something went wrong");
+      }
+    })
+    .finally(function () {
+      $scope.isLoading = false;
+    })
+  }
 
   $scope.loadEpisodesEdit = function(season, item){
     item.season = season;
@@ -108,16 +138,24 @@ function ($rootScope, $scope, $state, user, auth, $mdDialog, $q, localStorageSer
       locals: {
         episode: episode,
         checkIfOwner: $scope.checkIfOwner,
-        setLoading: $scope.setLoading
+        setLoading: $scope.setLoading,
+        localStorageService: localStorageService
       },
       controller: DialogController,
       clickOutsideToClose:true
     });
-    function DialogController($scope, $mdDialog, episode, checkIfOwner, setLoading) {
+    function DialogController($scope, $mdDialog, episode, checkIfOwner, setLoading, localStorageService) {
       $scope.episode = episode;
       $scope.checkIfOwner = checkIfOwner;
       $scope.checkIfClaimed = function(episode){
         if(!angular.equals(episode.claimed_by_user,'0')){
+          return true;
+        }
+        return false;
+      }
+      $scope.checkIfClaimedByUser = function (episode){
+        var current_user_id = localStorageService.get('user_id');
+        if(angular.equals(episode.claimed_by_user, current_user_id)){
           return true;
         }
         return false;

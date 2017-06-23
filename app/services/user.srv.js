@@ -22,7 +22,12 @@ function userService($http, API, auth) {
     return $http.get(API + '/series/list')
   }
   self.createSeries = function (body) {
-    return $http.post(API + '/series', body)
+    debugger;
+    if (body.preexisting_id != null) {
+      return $http.post(API + '/series/' + body.preexisting_id, body);
+    } else {
+      return $http.post(API + '/series', body);
+    }
   };
   self.updateSeries = function (id, body) {
     return $http.put(API + '/series/' + id, body)
@@ -31,7 +36,7 @@ function userService($http, API, auth) {
     return $http.delete(API + '/series/' + id)
   };
   self.createEpisode = function (id, body) {
-    return $http.post(API + '/series/'+id+'/episodes', body)
+    return $http.post(API + '/series/' + id + '/episodes', body)
   };
   self.updateEpisode = function (id, body) {
     return $http.put(API + '/episodes/' + id, body)
@@ -40,16 +45,21 @@ function userService($http, API, auth) {
     return $http.delete(API + '/episodes/' + id)
   };
   self.claimEpisode = function (id) {
-    return $http.put(API + '/episodes/'+id+'/claim')
+    return $http.put(API + '/episodes/' + id + '/claim')
   };
   self.unClaimEpisode = function (id) {
-    return $http.delete(API + '/episodes/'+id+'/claim')
+    return $http.delete(API + '/episodes/' + id + '/claim')
   };
   self.watchEpisode = function (id) {
-    return $http.put(API + '/episodes/'+id+'/watch')
+    return $http.put(API + '/episodes/' + id + '/watch')
   };
   self.unWatchEpisode = function (id) {
-    return $http.delete(API + '/episodes/'+id+'/watch')
+    return $http.delete(API + '/episodes/' + id + '/watch')
   };
-
+  self.searchPrexistingSeries = function (queryParam) {
+    return $http.get(API + '/external/search/' + queryParam)
+  };
+  self.refreshEpisodes = function (series_id, body) {
+    return $http.put(API + '/external/episodes/'+series_id+'/refresh', body)
+  };
 }

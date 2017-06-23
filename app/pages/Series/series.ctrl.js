@@ -54,6 +54,7 @@ function($rootScope, $scope, $state, user, auth, $mdDialog, $q, localStorageServ
      localStorageService.set("series_name",item.name);
      localStorageService.set("series_user_id",item.user_id);
      localStorageService.set("series_is_private",item.is_private);
+     localStorageService.set('series_is_preexisting',item.preexisting_id);
      $state.go('nav.episodes');
   }
 
