@@ -5,11 +5,13 @@ use \Firebase\JWT\JWT;
 
 require '../vendor/autoload.php';
 include_once '../resource/Database.php';
+include_once '../resource/DatabaseObj.php';
 include_once '../resource/ErrorHandler.php';
 require_once('../resource/TokenAuth.php');
 include_once('../resource/User.php');
 include_once('../resource/TVShows.php');
 include_once('../resource/TVShowsExternal.php');
+include_once('../resource/Mailer.php');
 
 header("Access-Control-Allow-Origin: *");
 header('Access-Control-Allow-Methods: GET, PUT, POST, DELETE, OPTIONS');
@@ -26,6 +28,12 @@ $app->post('/auth/login', function (Request $request, Response $response) use ($
 });
 $app->post('/auth/register', function (Request $request, Response $response) use ($db) {
     return register($request, $response, $db);
+});
+$app->post('/auth/forgotpassword', function (Request $request, Response $response, $args) use ($db) {
+    return sendRecoveryEmail($request, $response, $db);
+});
+$app->post('/auth/recoverpassword', function (Request $request, Response $response, $args) use ($db) {
+    return setRecoveredPassword($request, $response, $db);
 });
 $app->get('/series', function (Request $request, Response $response) use ($db) {
     return series_get($request, $response, $db);

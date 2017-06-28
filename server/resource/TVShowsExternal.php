@@ -33,7 +33,9 @@ function external_episodes_refresh(Request $request, Response $response, $series
 
     $user_id = $request->getAttribute('user_id');
 
-    echo json_encode($mergedSeries);
+    if(count($mergedSeries) == 0){
+        return $response->getBody()->write(json_encode('{"message":"There are no updates to be made"}'));
+    }
 
     return external_series_insert($response, $user_id, $series_id, $mergedSeries, $db);
 }

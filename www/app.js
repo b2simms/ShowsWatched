@@ -52,6 +52,21 @@ app.config(function($stateProvider, $urlRouterProvider) {
         templateUrl: 'templates/register.html',
         controller: 'RegisterCtrl'
     })
+    .state('forgot_password', {
+        url: '/forgot_password',
+        templateUrl: 'templates/forgotpassword.html',
+        controller: 'ForgotPasswordCtrl'
+    })
+    .state('password_recovery', {
+        url: '/password_recovery?requestID',
+        templateUrl: 'templates/passwordrecovery.html',
+        controller: 'PasswordRecoveryCtrl'
+    })
+    .state('nav.user_info', {
+        url: '/user_info',
+        templateUrl: 'templates/userinfo.html',
+        controller: 'UserInfoCtrl'
+    })
     .state('nav.series', {
         url: '/series',
         templateUrl: 'templates/series.html',
@@ -146,6 +161,17 @@ function userService($http, API, auth) {
       email: email
     })
   };
+  self.forgotPassword = function (email) {
+    return $http.post(API + '/auth/forgotpassword', {
+      email: email
+    })
+  };
+  self.recoverPassword = function (password, requestID) {
+    return $http.post(API + '/auth/recoverpassword', {
+      password: password,
+      requestID: requestID
+    })
+  };
   self.getSeries = function () {
     return $http.get(API + '/series')
   }
@@ -199,6 +225,7 @@ function ($rootScope, $scope, $state, user, auth, $mdDialog, $q, localStorageSer
   console.log("EpisodesCtrl initiated");
 
   $scope.isLoading = true;
+  $scope.allowRefresh = true;
 
   $scope.hgt = $window.innerHeight - 152;
 
@@ -246,6 +273,7 @@ function ($rootScope, $scope, $state, user, auth, $mdDialog, $q, localStorageSer
 
   $scope.refreshEpisodes = function(){
     $scope.isLoading = true;
+    $scope.allowRefresh = false;
     series_id = localStorageService.get('series_id');
     var body = {};
     body.series_is_preexisting = localStorageService.get('series_is_preexisting');
@@ -540,12 +568,43 @@ function ($rootScope, $scope, $state, user, auth, $mdDialog) {
   }
 
 }]);
+app.controller('ForgotPasswordCtrl', ['$scope', '$state', 'user','auth', function($scope, $state, user, auth) {
+  var $scope = $scope;
+
+  console.log("ForgotPasswordCtrl called.");
+
+  $scope.forgotPassword = function() {
+    $scope.isLoading = true;
+    user.forgotPassword($scope.email)
+      .then(function(res){
+        $state.go('login', { register: "Recovery email sent successfully if exists." });
+      })
+      .catch(function(err){
+        console.log(err);
+        try{
+          $scope.message = err.data.message;
+        }catch(err){
+          console.log(err);
+          $scope.message = "Cannot send recovery email - please contact system admin";
+        }
+      })
+      .finally(function(){
+        $scope.isLoading = false;
+      })
+  }
+
+}]);
 app.controller('LoginCtrl', ['$scope', '$state', '$stateParams', 'user','auth', 'localStorageService', function($scope, $state, $stateParams, user, auth, localStorageService) {
   var $scope = $scope;
+  $scope.showPassword = false;
+
+  $scope.flipPass = function(){
+    $scope.showPassword = $scope.showPassword ? false : true;
+  }
 
   console.log("LoginCtrl called.");
 
-  if($stateParams.username != null){
+  if($stateParams.register != null){
     $scope.username = $stateParams.username;
     $scope.register_message = $stateParams.register;
   }
@@ -580,12 +639,12 @@ app.controller('LoginCtrl', ['$scope', '$state', '$stateParams', 'user','auth', 
 app.controller('NavCtrl', ['$scope', '$state', 'user', 'auth', function ($scope, $state, user, auth) {
   console.log("Navbar called.");
 
-  var series_name = "My Series";
-  var manage_name = "Manage";
+  var series_name = "My Watch List";
+  var manage_name = "User Info";
   $scope.series_name = series_name;
   $scope.manage_name = manage_name;
 
-  $scope.title = "My Series";
+  $scope.title = "My Watch List";
 
   $scope.logout = function () {
     auth.logout && auth.logout()
@@ -605,6 +664,33 @@ app.controller('NavCtrl', ['$scope', '$state', 'user', 'auth', function ($scope,
       $state.go('nav.user_info');
     }
   }
+}]);
+app.controller('PasswordRecoveryCtrl', ['$scope', '$state', 'user','auth', function($scope, $state, user, auth) {
+  var $scope = $scope;
+
+  console.log("PasswordRecoveryCtrl called.");
+
+  $scope.recoverPassword = function() {
+    $scope.isLoading = true;
+    debugger;
+    user.recoverPassword($scope.password, $state.params.requestID)
+      .then(function(res){
+        $state.go('login', { register: "Password updated." });
+      })
+      .catch(function(err){
+        console.log(err);
+        try{
+          $scope.message = err.data.message;
+        }catch(err){
+          console.log(err);
+          $scope.message = "Cannot reset password - please contact system admin";
+        }
+      })
+      .finally(function(){
+        $scope.isLoading = false;
+      })
+  }
+
 }]);
 app.controller('RegisterCtrl', ['$scope', '$state', 'user','auth', function($scope, $state, user, auth) {
   var $scope = $scope;
@@ -870,4 +956,30 @@ app.controller('SeriesPreexistingCtrl', ['$scope', '$state', 'user', 'auth', fun
       }
     );
   }
+}]);
+app.controller('UserInfoCtrl', ['$scope', '$state', 'user','auth', function($scope, $state, user, auth) {
+  var $scope = $scope;
+
+  console.log("RegisterCtrl called.");
+
+  $scope.register = function() {
+    $scope.isLoading = true;
+    user.register($scope.username, $scope.password, $scope.email)
+      .then(function(res){
+        $state.go('login', { username: $scope.username, register: "Registration successful -> "+$scope.username+" created!" });
+      })
+      .catch(function(err){
+        console.log(err);
+        try{
+          $scope.message = err.data.message;
+        }catch(err){
+          console.log(err);
+          $scope.message = "Cannot register - please contact system admin";
+        }
+      })
+      .finally(function(){
+        $scope.isLoading = false;
+      })
+  }
+
 }]);

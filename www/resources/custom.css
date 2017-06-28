@@ -111,3 +111,14 @@ md-list-item.md-3-line .md-list-item-text p, md-list-item.md-3-line > .md-no-sty
     overflow: visible;
     white-space: normal;
 }
+md-list-item.md-3-line .md-list-item-text p, md-list-item.md-3-line > .md-no-style .md-list-item-text .item-fixed-height {
+  display: block; /* Fallback for non-webkit */
+  display: -webkit-box;
+  max-width: 100%;
+  max-height: 75px; /* Fallback for non-webkit */
+  margin: 0 auto;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

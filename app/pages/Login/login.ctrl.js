@@ -1,9 +1,14 @@
 app.controller('LoginCtrl', ['$scope', '$state', '$stateParams', 'user','auth', 'localStorageService', function($scope, $state, $stateParams, user, auth, localStorageService) {
   var $scope = $scope;
+  $scope.showPassword = false;
+
+  $scope.flipPass = function(){
+    $scope.showPassword = $scope.showPassword ? false : true;
+  }
 
   console.log("LoginCtrl called.");
 
-  if($stateParams.username != null){
+  if($stateParams.register != null){
     $scope.username = $stateParams.username;
     $scope.register_message = $stateParams.register;
   }

@@ -17,13 +17,18 @@
             <div ng-message="required" class="my-message">Username</div>
           </div>
         </md-input-container>
+
         <md-input-container class="md-block">
           <label>Password</label>
-          <input type="password" name="password" ng-model="password" placeholder="password" ng-disabled="isLoading" required="" />
+          <input ng-attr-type="{{ showPassword ? 'text' : 'password' }}" name="password" ng-model="password" placeholder="password"
+            ng-disabled="isLoading" required="" />
           <div ng-messages="Form.password.$error" role="alert" multiple="">
             <div ng-message="required" class="my-message">Password</div>
           </div>
+          <md-icon class="material-icons" ng-if="showPassword" ng-click="flipPass()">visibility_off</md-icon>
+          <md-icon class="material-icons" ng-if="!showPassword" ng-click="flipPass()">visibility</md-icon>
         </md-input-container>
+
 
         <span ng-show="register_message">{{register_message}}<br><br></span>
         <span md-colors="{color:'warn'}" ng-show="message">{{message}}<br><br></span>
@@ -31,6 +36,8 @@
         <md-button ng-disabled="!Form.$valid || isLoading" ng-click="login()" class="md-raised md-primary">&nbsp Login &nbsp</md-button>
 
         <md-button class="md-accent" ui-sref="register">Register</md-button>
+        <br>
+        <md-button class="md-primary" ui-sref="forgot_password">Forgot Password?</md-button>
       </form>
     </md-card-content>
   </md-card>

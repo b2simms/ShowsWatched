@@ -1,12 +1,12 @@
 app.controller('NavCtrl', ['$scope', '$state', 'user', 'auth', function ($scope, $state, user, auth) {
   console.log("Navbar called.");
 
-  var series_name = "My Series";
-  var manage_name = "Manage";
+  var series_name = "My Watch List";
+  var manage_name = "User Info";
   $scope.series_name = series_name;
   $scope.manage_name = manage_name;
 
-  $scope.title = "My Series";
+  $scope.title = "My Watch List";
 
   $scope.logout = function () {
     auth.logout && auth.logout()

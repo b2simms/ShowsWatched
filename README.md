@@ -10,5 +10,12 @@
 - Clone project from github
 - Put local database credentials
 - Run database init
+- Run `npm install` from root folder
+- Launch Wamp server
 - Run `gulp watch` from root folder
-- Fire up PHP server `php -S localhost:8080` from server/public folder
+- Fire up PHP server `php -S localhost:8080` from server/public_html folder
+
+### Production
+- App.js: Change API route
+- Database.php: Change database credentials
+- Mailer.php: Change API route

@@ -16,6 +16,21 @@ app.config(function($stateProvider, $urlRouterProvider) {
         templateUrl: 'templates/register.html',
         controller: 'RegisterCtrl'
     })
+    .state('forgot_password', {
+        url: '/forgot_password',
+        templateUrl: 'templates/forgotpassword.html',
+        controller: 'ForgotPasswordCtrl'
+    })
+    .state('password_recovery', {
+        url: '/password_recovery?requestID',
+        templateUrl: 'templates/passwordrecovery.html',
+        controller: 'PasswordRecoveryCtrl'
+    })
+    .state('nav.user_info', {
+        url: '/user_info',
+        templateUrl: 'templates/userinfo.html',
+        controller: 'UserInfoCtrl'
+    })
     .state('nav.series', {
         url: '/series',
         templateUrl: 'templates/series.html',

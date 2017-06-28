@@ -15,6 +15,17 @@ function userService($http, API, auth) {
       email: email
     })
   };
+  self.forgotPassword = function (email) {
+    return $http.post(API + '/auth/forgotpassword', {
+      email: email
+    })
+  };
+  self.recoverPassword = function (password, requestID) {
+    return $http.post(API + '/auth/recoverpassword', {
+      password: password,
+      requestID: requestID
+    })
+  };
   self.getSeries = function () {
     return $http.get(API + '/series')
   }

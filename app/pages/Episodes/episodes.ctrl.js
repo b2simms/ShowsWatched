@@ -3,6 +3,7 @@ function ($rootScope, $scope, $state, user, auth, $mdDialog, $q, localStorageSer
   console.log("EpisodesCtrl initiated");
 
   $scope.isLoading = true;
+  $scope.allowRefresh = true;
 
   $scope.hgt = $window.innerHeight - 152;
 
@@ -50,6 +51,7 @@ function ($rootScope, $scope, $state, user, auth, $mdDialog, $q, localStorageSer
 
   $scope.refreshEpisodes = function(){
     $scope.isLoading = true;
+    $scope.allowRefresh = false;
     series_id = localStorageService.get('series_id');
     var body = {};
     body.series_is_preexisting = localStorageService.get('series_is_preexisting');

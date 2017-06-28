@@ -6,8 +6,10 @@
           <div flex="66" layout="row">
             <h2>{{title}}</h2>
             <section layout="row" layout-align="start stretch">
-              <md-button ng-disabled="button[0]" ng-click="open(0)">My Lists</md-button>
-              <md-button ng-disabled="button[1]" ng-click="open(1)">Create Series</md-button>
+              <md-button ng-disabled="button[0]" ng-click="open(0)">{{series_name}}</md-button>
+            </section>
+            <section layout="row" layout-align="start stretch">
+              <md-button ng-disabled="button[1]" ng-click="open(1)">{{manage_name}}</md-button>
             </section>
           </div>
           <div flex="33" layout="row" layout-align="end center">

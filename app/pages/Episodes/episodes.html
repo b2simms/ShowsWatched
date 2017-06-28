@@ -14,7 +14,7 @@
 
   <div layout="column">
     <md-button class="md-raised md-accent" ng-show="isEditable && checkIfOwner()" ui-sref="episodes_create">Create New Episode</md-button>
-    <md-button class="md-accent" ng-show="isEditable && checkIfPreexisting()" ng-click="refreshEpisodes()">
+    <md-button class="md-accent" ng-show="isEditable && checkIfPreexisting()" ng-disabled="!allowRefresh" ng-click="refreshEpisodes()">
       <md-icon class="material-icons">autorenew</md-icon>
       Update from tvmaze.com
     </md-button>
@@ -23,7 +23,7 @@
   <md-progress-linear md-mode="indeterminate" ng-show="isLoading"></md-progress-linear>
   <div class="scrollable" ng-style="{height: hgt+ 'px'}">
     <md-list ng-repeat="item in seasons track by $index" class="no-padding">
-      <md-subheader id="season_{{item.season}}" class="md-no-sticky">Season {{item.season}}</md-subheader>
+      <md-subheader id="season_{{item.season}}" class="md-no-sticky"><b>Season {{item.season}}</b> (Episodes {{item.episodes.length}})</md-subheader>
       <md-divider></md-divider>
       <md-list-item class="md-3-line" ng-repeat="episode in item.episodes track by $index" ng-click="openDialog(this, episode)">
         <div flex class="md-list-item-text series-box">
@@ -38,7 +38,7 @@
             <h4>Season {{ item.season }}, Episode {{ episode.episode }}</h4>
           </div>
           <div>
-            <p ng-show="episode.description != 0">{{ episode.description }}</p>
+            <p class="item-fixed-height" md-truncate md-ellipsis ng-show="episode.description != 0">{{ episode.description }}</p>
           </div>
         </div>
         <div flex="20" ng-if="isEditable && checkIfOwner()">
@@ -60,7 +60,7 @@
   </div>
 
   <md-button class="md-fab md-primary fab-offset" ng-show="checkIfOwner()" ng-click="isEditable = !isEditable">
-    <md-icon class="material-icons" ng-show="isEditable">create</md-icon>
-    <md-icon class="material-icons" ng-show="!isEditable">visibility</md-icon>
+    <md-icon class="material-icons" ng-show="!isEditable">create</md-icon>
+    <md-icon class="material-icons" ng-show="isEditable">visibility</md-icon>
   </md-button>
 </section>
