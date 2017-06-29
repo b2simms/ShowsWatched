@@ -290,7 +290,7 @@ function episodes_create(Request $request, Response $response, $series_id, $db) 
     }catch (PDOException $e) {
         if ($e->getCode() == 23000) {
             // Take some action if there is a key constraint violation, i.e. duplicate name
-            return error422($response, "You have already created an episode with that name; please choose a new one");
+            return error422($response, "You have already created an episode with that name or duplicate season/episode in series; please choose a new one");
         } else {
             return error422($response, "Unsuccessful creation of episode: ".$e->getMessage());
         }
@@ -351,7 +351,7 @@ function episodes_update(Request $request, Response $response, $id, $db) {
      }catch (PDOException $e) {
         if ($e->getCode() == 23000) {
             // Take some action if there is a key constraint violation, i.e. duplicate name
-            return error422($response, "You have already created an episode with that name; please choose a new one");
+            return error422($response, "You have already created an episode with that name or duplicate season/episode in series; please choose a new one");
         } else {
             return error422($response, "Unsuccessful update of episode: ".$e->getMessage());
         }
