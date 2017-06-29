@@ -23,7 +23,7 @@
   <md-progress-linear md-mode="indeterminate" ng-show="isLoading"></md-progress-linear>
   <div class="scrollable" ng-style="{height: hgt+ 'px'}">
     <md-list ng-repeat="item in seasons track by $index" class="no-padding">
-      <md-subheader id="season_{{item.season}}" class="md-no-sticky"><b>Season {{item.season}}</b> (Episodes {{item.episodes.length}})</md-subheader>
+      <md-subheader ng-click="openDialogSeason(this, item.season)" id="season_{{item.season}}" class="md-no-sticky"><b>Season {{item.season}}</b> (Episodes {{item.episodes.length}})</md-subheader>
       <md-divider></md-divider>
       <md-list-item class="md-3-line" ng-repeat="episode in item.episodes track by $index" ng-click="openDialog(this, episode)">
         <div flex class="md-list-item-text series-box">

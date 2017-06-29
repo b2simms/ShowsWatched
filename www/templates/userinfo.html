@@ -1,39 +1,33 @@
 <md-content layout="row" layout-align="space-around" layout-padding="layout-padding" ng-cloak="ng-cloak" class="login-form">
   <md-card flex="flex" flex-gt-sm="50" flex-gt-md="33">
-    <md-toolbar>
-      <div class="md-toolbar-tools">
-        <md-button><md-icon class="material-icons" ui-sref="login">keyboard_return</md-icon></md-button><h2><span>Register</span></h2>
-      </div>
-    </md-toolbar>
-
     <md-progress-linear class="md-accent" md-mode="indeterminate" ng-show="isLoading"></md-progress-linear>
 
     <md-card-content>
       <form name="Form">
         <md-input-container class="md-block">
           <label>Username</label>
-          <input type="text" name="username" ng-model="username" placeholder="username" ng-disabled="isLoading" required="" />
+          <input type="text" name="username" ng-model="body.username" placeholder="username" ng-disabled="isLoading" required="" />
           <div ng-messages="Form.username.$error" role="alert" multiple="">
             <div ng-message="required" class="my-message">Enter username</div>
           </div>
         </md-input-container>
         <md-input-container class="md-block">
           <label>Email</label>
-          <input type="text" name="email" ng-model="email" placeholder="email@gmail.com" ng-disabled="isLoading" required="" />
+          <input type="text" name="email" ng-model="body.email" placeholder="email@gmail.com" ng-disabled="isLoading" required="" />
           <div ng-messages="Form.email.$error" role="alert" multiple="">
             <div ng-message="required" class="my-message">Enter email</div>
           </div>
         </md-input-container>
         <md-input-container class="md-block">
-          <label>Password</label>
-          <input type="password" name="password" ng-model="password" placeholder="password" ng-disabled="isLoading" required="" />
+          <label>New Password</label>
+          <input type="password" name="password" ng-model="body.password" placeholder="password" ng-disabled="isLoading" />
           <div ng-messages="Form.password.$error" role="alert" multiple="">
             <div ng-message="required" class="my-message">Enter password</div>
           </div>
         </md-input-container>
         <md-input-container class="md-block">
           <label>Re-type Password</label>
-          <input type="password" name="password2" ng-model="password2" placeholder="password" ng-disabled="isLoading" compare-to="password" required="" />
+          <input type="password" name="password2" ng-model="password2" placeholder="password" ng-disabled="isLoading" compare-to="password" />
           <div ng-messages="Form.password2.$error" role="alert" multiple="">
             <div ng-message="required" class="my-message">Passwords do not match</div>
           </div>
@@ -42,9 +36,10 @@
           </div>
         </md-input-container>
 
+        <span ng-show="success_message">{{success_message}}<br><br></span>
         <span md-colors="{color:'warn'}" ng-show="message">{{message}}<br><br></span>
 
-        <md-button ng-disabled="!Form.$valid || isLoading" ng-click="register()" class="md-raised md-primary">&nbsp Register &nbsp</md-button>
+        <md-button ng-disabled="!Form.$valid || isLoading" ng-click="updateInfo()" class="md-raised md-primary">&nbsp Update Information &nbsp</md-button>
       </form>
     </md-card-content>
   </md-card>

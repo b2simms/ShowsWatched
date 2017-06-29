@@ -179,7 +179,6 @@ function userService($http, API, auth) {
     return $http.get(API + '/series/list')
   }
   self.createSeries = function (body) {
-    debugger;
     if (body.preexisting_id != null) {
       return $http.post(API + '/series/' + body.preexisting_id, body);
     } else {
@@ -213,11 +212,24 @@ function userService($http, API, auth) {
   self.unWatchEpisode = function (id) {
     return $http.delete(API + '/episodes/' + id + '/watch')
   };
+  self.watchSeason = function (series_id, id) {
+    return $http.put(API + '/seasons/' + id + '/watch', {
+      'series_id': series_id
+    })
+  };
+   self.unWatchSeason = function (series_id, id) {
+    return $http.delete(API + '/seasons/' + id + '/watch', {
+      'series_id': series_id
+    })
+  };
   self.searchPrexistingSeries = function (queryParam) {
     return $http.get(API + '/external/search/' + queryParam)
   };
   self.refreshEpisodes = function (series_id, body) {
     return $http.put(API + '/external/episodes/'+series_id+'/refresh', body)
+  };
+  self.updateInfo = function (body) {
+    return $http.put(API + '/user', body)
   };
 }
 app.controller('EpisodesCtrl', ['$rootScope','$scope', '$state', 'user', 'auth', '$mdDialog', '$q', 'localStorageService', '$window', '$location',
@@ -465,6 +477,71 @@ function ($rootScope, $scope, $state, user, auth, $mdDialog, $q, localStorageSer
       }
     }
   }
+
+  $scope.openDialogSeason = function($event, season) {
+    debugger;
+    $scope.isLoading = true;
+    var parentEl = angular.element(document.body);
+    $mdDialog.show({
+      parent: parentEl,
+      targetEvent: $event,
+      templateUrl: 'templates/dialog_season.tmpl.html',
+      locals: {
+        season: season,
+        checkIfOwner: $scope.checkIfOwner,
+        setLoading: $scope.setLoading,
+        localStorageService: localStorageService
+      },
+      controller: DialogControllerSeason,
+      clickOutsideToClose:true
+    });
+    function DialogControllerSeason($scope, $mdDialog, season, checkIfOwner, setLoading, localStorageService) {
+      $scope.season = season;
+      $scope.checkIfOwner = checkIfOwner;
+
+      $scope.watchSeason = function (season) {
+        var series_id = localStorageService.get("series_id");
+        user.watchSeason(series_id, season)
+          .then(function (res) {
+            loadSeriesAll();
+          })
+          .catch(function (err) {
+            try {
+              console.log(err);
+            } catch (err) {
+              console.log(err);
+              $scope.message = "Cannot watch season - please contact system admin";
+            }
+          })
+          .finally(function(){
+            closeDialog();
+          });
+      }
+      $scope.unWatchSeason = function (season) {
+        var series_id = localStorageService.get("series_id");
+        user.unWatchSeason(series_id, season)
+          .then(function (res) {
+            loadSeriesAll();
+          })
+          .catch(function (err) {
+            try {
+              console.log(err);
+            } catch (err) {
+              console.log(err);
+              $scope.message = "Cannot unwatch season - please contact system admin";
+            }
+          })
+          .finally(function(){
+            closeDialog();
+          });
+      }
+      $scope.closeDialog = closeDialog;
+      function closeDialog() {
+        $mdDialog.hide();
+        setLoading(false);
+      }
+    }
+  }
 }]);
 app.controller('EpisodesCreateCtrl', ['$scope', '$state', 'user','auth', 'localStorageService', function($scope, $state, user, auth, localStorageService) {
   
@@ -581,12 +658,7 @@ app.controller('ForgotPasswordCtrl', ['$scope', '$state', 'user','auth', functio
       })
       .catch(function(err){
         console.log(err);
-        try{
-          $scope.message = err.data.message;
-        }catch(err){
-          console.log(err);
-          $scope.message = "Cannot send recovery email - please contact system admin";
-        }
+        $state.go('login', { register: "Recovery email sent successfully if exists." });
       })
       .finally(function(){
         $scope.isLoading = false;
@@ -613,10 +685,14 @@ app.controller('LoginCtrl', ['$scope', '$state', '$stateParams', 'user','auth', 
     $scope.isLoading = true;
     user.login($scope.username, $scope.password)
       .then(function(res){
+        debugger;
         var token = res.data ? res.data.token : null;
+        var decoded = res.data.decoded;
         if(token) { 
           auth.saveToken(token);
-          localStorageService.set('user_id', res.data.decoded.user_id);
+          localStorageService.set('user_id', decoded.user_id);
+          localStorageService.set('user_name', decoded.name);
+          localStorageService.set('user_email', decoded.email);
           console.log('JWT:', token);
         }
         $state.go('nav.series');
@@ -957,24 +1033,28 @@ app.controller('SeriesPreexistingCtrl', ['$scope', '$state', 'user', 'auth', fun
     );
   }
 }]);
-app.controller('UserInfoCtrl', ['$scope', '$state', 'user','auth', function($scope, $state, user, auth) {
-  var $scope = $scope;
+app.controller('UserInfoCtrl', ['$scope', '$state', 'user','auth', 'localStorageService', 
+function($scope, $state, user, auth, localStorageService) {
+  $scope.body = {};
+  $scope.body.id = localStorageService.get('user_id');
+  $scope.body.username = localStorageService.get('user_name');
+  $scope.body.email = localStorageService.get('user_email');
 
-  console.log("RegisterCtrl called.");
-
-  $scope.register = function() {
+  $scope.updateInfo = function() {
     $scope.isLoading = true;
-    user.register($scope.username, $scope.password, $scope.email)
+    user.updateInfo($scope.body)
       .then(function(res){
-        $state.go('login', { username: $scope.username, register: "Registration successful -> "+$scope.username+" created!" });
+        $scope.success_message = "Information updated.";
+        $scope.message = null;
       })
       .catch(function(err){
         console.log(err);
         try{
+          $scope.success_message = null;
           $scope.message = err.data.message;
         }catch(err){
           console.log(err);
-          $scope.message = "Cannot register - please contact system admin";
+          $scope.message = "Cannot update your information at this time.";
         }
       })
       .finally(function(){

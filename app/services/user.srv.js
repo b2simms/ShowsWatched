@@ -33,7 +33,6 @@ function userService($http, API, auth) {
     return $http.get(API + '/series/list')
   }
   self.createSeries = function (body) {
-    debugger;
     if (body.preexisting_id != null) {
       return $http.post(API + '/series/' + body.preexisting_id, body);
     } else {
@@ -67,10 +66,23 @@ function userService($http, API, auth) {
   self.unWatchEpisode = function (id) {
     return $http.delete(API + '/episodes/' + id + '/watch')
   };
+  self.watchSeason = function (series_id, id) {
+    return $http.put(API + '/seasons/' + id + '/watch', {
+      'series_id': series_id
+    })
+  };
+   self.unWatchSeason = function (series_id, id) {
+    return $http.delete(API + '/seasons/' + id + '/watch', {
+      'series_id': series_id
+    })
+  };
   self.searchPrexistingSeries = function (queryParam) {
     return $http.get(API + '/external/search/' + queryParam)
   };
   self.refreshEpisodes = function (series_id, body) {
     return $http.put(API + '/external/episodes/'+series_id+'/refresh', body)
+  };
+  self.updateInfo = function (body) {
+    return $http.put(API + '/user', body)
   };
 }

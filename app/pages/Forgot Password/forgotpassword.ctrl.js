@@ -11,12 +11,7 @@ app.controller('ForgotPasswordCtrl', ['$scope', '$state', 'user','auth', functio
       })
       .catch(function(err){
         console.log(err);
-        try{
-          $scope.message = err.data.message;
-        }catch(err){
-          console.log(err);
-          $scope.message = "Cannot send recovery email - please contact system admin";
-        }
+        $state.go('login', { register: "Recovery email sent successfully if exists." });
       })
       .finally(function(){
         $scope.isLoading = false;

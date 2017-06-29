@@ -79,6 +79,12 @@ $app->put('/episodes/{id}/watch', function (Request $request, Response $response
 $app->delete('/episodes/{id}/watch', function (Request $request, Response $response, $args) use ($db) {
     return episodes_watch($request, $response, $args['id'], $db, 'F');
 });
+$app->put('/seasons/{id}/watch', function (Request $request, Response $response, $args) use ($db) {
+    return seasons_watch($request, $response, $args['id'], $db, 'T');
+});
+// $app->delete('/seasons/{id}/watch', function (Request $request, Response $response, $args) use ($db) {
+//     return seasons_watch($request, $response, $args['id'], $db, 'F');
+// });
 $app->put('/episodes/{id}/claim', function (Request $request, Response $response, $args) use ($db) {
     return episodes_claim($request, $response, $args['id'], $db, true);
 });
@@ -91,18 +97,8 @@ $app->get('/external/search/{name}', function (Request $request, Response $respo
 $app->put('/external/episodes/{id}/refresh', function (Request $request, Response $response, $args) use ($db) {
     return external_episodes_refresh($request, $response, $args['id'], $db);
 });
-
-$app->get('/test/episodes/{id}', function (Request $request, Response $response, $args) use ($db) {
-    return external_episodes_get($request, $response, $args['id'], $db);
-});
-$app->get('/test', function (Request $request, Response $response) {
-
-    $output = new stdClass();    
-    $output->time = time();
-    $myJson = json_encode($output);
-    $response->getBody()->write($myJson);
-
-    return $response;
+$app->put('/user', function (Request $request, Response $response, $args) use ($db) {
+    return updateUser($request, $response, $db);
 });
 
 $app->run();

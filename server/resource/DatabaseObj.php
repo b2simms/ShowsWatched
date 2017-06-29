@@ -2,6 +2,7 @@
 
 try{
     //create an instance of the PDO class with the required parameters
+    $dsn = 'mysql:host='.$db_host.'; dbname='.$db_name;
     $db = new PDO($dsn, $username, $password);
 
     //set pdo error mode to exception

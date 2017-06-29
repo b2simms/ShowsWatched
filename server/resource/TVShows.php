@@ -380,12 +380,48 @@ function episodes_watch(Request $request, Response $response, $id, $db, $is_watc
         }
 
         //enter new user into the database
-        $sqlInsert = "UPDATE episodes SET is_watched = :is_watched
+        $sqlInsert = "UPDATE episodes SET is_watched = :is_watched, date = now()
             WHERE id = :id";
         $stmt = $db->prepare($sqlInsert);
         $stmt->execute(array(':id' => $id, ':is_watched' => $is_watched));
         if(!$stmt->rowCount()){
             throw new PDOException('Episode not updated.');
+        }
+     }catch (PDOException $e) {
+        return error422($response, "Unsuccessful update of episode: ".$e->getMessage());
+    }catch(Exception $e){
+        return error422($response, "Unsuccessful update of episode: ".$e->getMessage());
+    }
+    $response = $response->withStatus(201);
+    return $response;
+}
+
+function seasons_watch(Request $request, Response $response, $id, $db, $is_watched) {
+    $user_id = $request->getAttribute('user_id');
+    $body = $request->getBody();
+    $input = json_decode($body);
+    $series_id = $input->series_id;
+
+    $output = new stdClass();
+    try{
+        $sqlQuery = "SELECT * FROM series 
+            WHERE id = :series_id 
+            AND user_id = :user_id 
+            AND deleted_date = '0000-00-00 00:00:00'";
+        $stmt = $db->prepare($sqlQuery);
+        $stmt->execute(array(':series_id' => $series_id, ':user_id' => $user_id));
+
+        if($stmt->rowCount() == 0){
+             return error422($response,"Unauthorized operation - user may not own the series");
+        }
+
+        //enter new user into the database
+        $sqlInsert = "UPDATE episodes SET is_watched = :is_watched, date = now()
+            WHERE series_id = :series_id AND season = :id";
+        $stmt = $db->prepare($sqlInsert);
+        $stmt->execute(array(':series_id' => $series_id, ':id' => $id, ':is_watched' => $is_watched));
+        if(!$stmt->rowCount()){
+            throw new PDOException('Episodes not updated.');
         }
      }catch (PDOException $e) {
         return error422($response, "Unsuccessful update of episode: ".$e->getMessage());

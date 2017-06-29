@@ -1,0 +1,21 @@
+<md-dialog aria-label="List dialog">
+    <md-dialog-content>
+        <div>
+            <div>
+                <md-whiteframe class="md-whiteframe-10dp" layout="column" layout-align="center center">
+                    <h3 class="episode-info">Season {{season}}</h3>
+                </md-whiteframe>
+            </div>
+            <div ng-if="checkIfOwner()">
+                <md-whiteframe class="md-whiteframe-1dp padded" layout="column" layout-align="center center">                  
+                    <md-button class="md-raised orange md-hue-1" ng-click="watchSeason(season)">Watch whole season</md-button>
+                </md-whiteframe>
+            </div>
+        </div>
+    </md-dialog-content>
+    <md-dialog-actions>
+        <md-button ng-click="closeDialog()" class="md-primary">
+            Close
+        </md-button>
+    </md-dialog-actions>
+</md-dialog>

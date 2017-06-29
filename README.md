@@ -17,5 +17,4 @@
 
 ### Production
 - App.js: Change API route
-- Database.php: Change database credentials
-- Mailer.php: Change API route
+- Database.php: Change database and api credentials

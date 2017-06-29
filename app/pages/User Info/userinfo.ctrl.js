@@ -1,21 +1,25 @@
-app.controller('UserInfoCtrl', ['$scope', '$state', 'user','auth', function($scope, $state, user, auth) {
-  var $scope = $scope;
+app.controller('UserInfoCtrl', ['$scope', '$state', 'user','auth', 'localStorageService', 
+function($scope, $state, user, auth, localStorageService) {
+  $scope.body = {};
+  $scope.body.id = localStorageService.get('user_id');
+  $scope.body.username = localStorageService.get('user_name');
+  $scope.body.email = localStorageService.get('user_email');
 
-  console.log("RegisterCtrl called.");
-
-  $scope.register = function() {
+  $scope.updateInfo = function() {
     $scope.isLoading = true;
-    user.register($scope.username, $scope.password, $scope.email)
+    user.updateInfo($scope.body)
       .then(function(res){
-        $state.go('login', { username: $scope.username, register: "Registration successful -> "+$scope.username+" created!" });
+        $scope.success_message = "Information updated.";
+        $scope.message = null;
       })
       .catch(function(err){
         console.log(err);
         try{
+          $scope.success_message = null;
           $scope.message = err.data.message;
         }catch(err){
           console.log(err);
-          $scope.message = "Cannot register - please contact system admin";
+          $scope.message = "Cannot update your information at this time.";
         }
       })
       .finally(function(){

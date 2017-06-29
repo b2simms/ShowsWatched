@@ -243,4 +243,69 @@ function ($rootScope, $scope, $state, user, auth, $mdDialog, $q, localStorageSer
       }
     }
   }
+
+  $scope.openDialogSeason = function($event, season) {
+    debugger;
+    $scope.isLoading = true;
+    var parentEl = angular.element(document.body);
+    $mdDialog.show({
+      parent: parentEl,
+      targetEvent: $event,
+      templateUrl: 'templates/dialog_season.tmpl.html',
+      locals: {
+        season: season,
+        checkIfOwner: $scope.checkIfOwner,
+        setLoading: $scope.setLoading,
+        localStorageService: localStorageService
+      },
+      controller: DialogControllerSeason,
+      clickOutsideToClose:true
+    });
+    function DialogControllerSeason($scope, $mdDialog, season, checkIfOwner, setLoading, localStorageService) {
+      $scope.season = season;
+      $scope.checkIfOwner = checkIfOwner;
+
+      $scope.watchSeason = function (season) {
+        var series_id = localStorageService.get("series_id");
+        user.watchSeason(series_id, season)
+          .then(function (res) {
+            loadSeriesAll();
+          })
+          .catch(function (err) {
+            try {
+              console.log(err);
+            } catch (err) {
+              console.log(err);
+              $scope.message = "Cannot watch season - please contact system admin";
+            }
+          })
+          .finally(function(){
+            closeDialog();
+          });
+      }
+      $scope.unWatchSeason = function (season) {
+        var series_id = localStorageService.get("series_id");
+        user.unWatchSeason(series_id, season)
+          .then(function (res) {
+            loadSeriesAll();
+          })
+          .catch(function (err) {
+            try {
+              console.log(err);
+            } catch (err) {
+              console.log(err);
+              $scope.message = "Cannot unwatch season - please contact system admin";
+            }
+          })
+          .finally(function(){
+            closeDialog();
+          });
+      }
+      $scope.closeDialog = closeDialog;
+      function closeDialog() {
+        $mdDialog.hide();
+        setLoading(false);
+      }
+    }
+  }
 }]);

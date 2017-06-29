@@ -19,7 +19,7 @@ function sendRecoveryEmail(Request $request, Response $response, $db) {
     //add random hash to user row and date
 
     $bytes = openssl_random_pseudo_bytes(32);
-    $reset_hash = base64_encode($bytes);
+    $reset_hash = base64url_encode($bytes);
 
     $isInserted = insertPasswordResetInfo($email, $reset_hash, $db);
     if( !$isInserted){
@@ -27,11 +27,15 @@ function sendRecoveryEmail(Request $request, Response $response, $db) {
     }
 
     //send email to that user plus 
-    $link = "http://localhost/doctorwho/ShowsWatched/www/#/password_recovery?requestID=".$reset_hash;
+    $link = client_site."#/password_recovery?requestID=".$reset_hash;
     sendEmailWithLink($email, $dataObj, $link);
 
     $response = $response->withStatus(201);
     return $response;
+}
+
+function base64url_encode($data) {
+    return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
 }
 
 function checkIfValidEmail($email, $db){
@@ -77,9 +81,10 @@ function insertPasswordResetInfo($email, $reset_hash, $db) {
 }
 
 function sendEmailWithLink($emailTo, $data, $link) {
+
     $transport = Swift_SmtpTransport::newInstance('smtp.gmail.com', 465, "ssl")
-    ->setUsername($mail_username)
-    ->setPassword($mail_password);
+    ->setUsername(mail_username)
+    ->setPassword(mail_password);
 
     $mailer = Swift_Mailer::newInstance($transport);
 

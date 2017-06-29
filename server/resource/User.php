@@ -20,6 +20,7 @@ function login(Request $request, Response $response, $db, $key) {
         $id = $row['id'];
         $hashed_password = $row['password'];
         $username = $row['username'];
+        $email = $row['email'];
         $role = $row['role'];
 
         $credentialsAreValid = false;
@@ -34,6 +35,7 @@ function login(Request $request, Response $response, $db, $key) {
                 "iat" => 1496844000,
                 "nbf" => 1496844000,
                 "name" => $username,
+                "email" => $email,
                 "user_id" => $id,
                 "role" => $role
             );
@@ -107,8 +109,51 @@ function register(Request $request, Response $response, $db) {
     return $response;
 }
 
+function updateUser(Request $request, Response $response, $db) {
+    //get body params
+    $body = $request->getBody();
+    $input = json_decode($body);
+    $sqlInsert = "UPDATE users SET ";
+    $arr = array();
+    $columnSet = false;
+    if(isset($input->username)){
+        $columnSet = true;
+        $sqlInsert .= "username = :username ";
+        $arr += [':username' => $input->username];
+    }
+    if(isset($input->password)){
+        $sqlInsert .= ($columnSet ? ", " : "");
+        $columnSet = true;
+        
+        $sqlInsert .= "password = :password ";
+        $hashed_password = password_hash($input->password, PASSWORD_DEFAULT);
+        $arr += [':password' => $hashed_password];
+    }
+    if(isset($input->email)){
+        $sqlInsert .= ($columnSet ? ", " : "");
+        $columnSet = true;
+
+        $sqlInsert .= "email = :email ";
+        $arr += [':email' => $input->email];
+    }
+
+    if( !$columnSet){
+        return error422($response, "Missing or invalid parameters");
+    }
+
+    $sqlInsert .= " WHERE id = :id";
+    $arr += [':id' => $input->id]; 
+
+    //update user in the database
+    $stmt = $db->prepare($sqlInsert);
+    $stmt->execute($arr);
+
+    $response = $response->withStatus(201);
+    return $response;
+}
+
 function setRecoveredPassword(Request $request, Response $response, $db) {
-    //get query params
+    //get body params
     $body = $request->getBody();
     $input = json_decode($body);
     $requestID = $input->requestID;
@@ -116,13 +161,15 @@ function setRecoveredPassword(Request $request, Response $response, $db) {
 
     //get user from request id
     $user = getUser($requestID, $db);
+    if( !$user){
+        return error422($response, "Password reset has expired. Please try process again.");
+    }
     //if all pass, update password with the new password - hash it with: password_hash($password, PASSWORD_DEFAULT);
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
     return updatePassword($user->id, $hashed_password, $db, $response);
 }
 function getUser($requestID, $db){
     //check that date reset_hash and reset_date are both set
-    //check 24 hours expiry on date
     $sqlQuery = "SELECT * FROM users 
         WHERE reset_hash = :requestID
         AND reset_date != '0000-00-00 00:00:00'
@@ -131,6 +178,16 @@ function getUser($requestID, $db){
     $userData = db_get($db, $sqlQuery, $params);
 
     if(count($userData) > 0){
+        //check 24 hours expiry on date
+        $reset_date = $userData[0]['reset_date'];
+        $reset_time = strtotime($reset_date);
+        $nextDay = time() + (24 * 60 * 60);
+
+        if($nextDay < $reset_time){
+            return false;
+        }
+
+    
         $tempObj = new stdClass();
         $tempObj->id = $userData[0]['id'];
         $tempObj->username = $userData[0]['username'];
